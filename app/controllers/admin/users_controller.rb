@@ -70,15 +70,10 @@ class Admin::UsersController < ApplicationController
   end
 
   def user_params
-    # Build permitted attributes list based on user permissions
-    permitted_attrs = [ :name, :email, :password, :password_confirmation ]
-
-    # Only super admins can modify role and super_admin attributes
-    # This is safe because require_super_admin before_action already enforces this
-    # brakeman:disable PermitAttributes
-    permitted_attrs += [ :role, :super_admin ] if current_user.super_admin?
-
-    params.require(:user).permit(*permitted_attrs)
+    # Only allow basic user attributes and role
+    # super_admin cannot be set via mass assignment for security
+    # (must be set manually via console/seeds)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
   end
 
   def require_super_admin
