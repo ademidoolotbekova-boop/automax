@@ -7,15 +7,15 @@ class Password::ResetController < ApplicationController
 
     if outcome.valid?
       # In production, would send email here
-      render json: { message: 'If that email exists, password reset instructions have been sent' }
+      render json: { message: "If that email exists, password reset instructions have been sent" }
     else
-      render json: { error: outcome.errors.full_messages.join(', ') }, status: :unprocessable_entity
+      render json: { error: outcome.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
   end
 
   # GET /password/reset?token=xyz
   def show
-    render inertia: 'Auth/ResetPassword', props: { token: params[:token] }
+    render inertia: "Auth/ResetPassword", props: { token: params[:token] }
   end
 
   # PUT /password/reset
@@ -27,9 +27,9 @@ class Password::ResetController < ApplicationController
     )
 
     if outcome.valid?
-      render json: { message: 'Password has been reset successfully' }
+      render json: { message: "Password has been reset successfully" }
     else
-      render json: { error: outcome.errors.full_messages.join(', ') }, status: :unprocessable_entity
+      render json: { error: outcome.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
   end
 end

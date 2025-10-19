@@ -19,7 +19,7 @@ module Services
           @user.errors.each do |error|
             errors.add(error.attribute, error.message)
           end
-          errors.add(:base, 'Could not reset password')
+          errors.add(:base, "Could not reset password")
         end
       end
 
@@ -33,7 +33,7 @@ module Services
           begin
             if BCrypt::Password.new(user.reset_password_digest) == token
               if user.password_reset_expired?
-                errors.add(:base, 'Invalid or expired password reset token')
+                errors.add(:base, "Invalid or expired password reset token")
                 return
               end
 
@@ -45,7 +45,7 @@ module Services
           end
         end
 
-        errors.add(:base, 'Invalid or expired password reset token') unless @user
+        errors.add(:base, "Invalid or expired password reset token") unless @user
       end
 
       def verify_password_match

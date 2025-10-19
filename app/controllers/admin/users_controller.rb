@@ -1,13 +1,13 @@
 class Admin::UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :require_super_admin
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :set_user, only: [ :show, :edit, :update, :destroy ]
 
   # GET /admin/users
   def index
     @pagy, @users = pagy(User.order(created_at: :desc), items: 20)
 
-    render inertia: 'Admin/Users/Index', props: {
+    render inertia: "Admin/Users/Index", props: {
       users: @users.map { |u| user_props(u) },
       pagination: pagination_props(@pagy)
     }
@@ -15,14 +15,14 @@ class Admin::UsersController < ApplicationController
 
   # GET /admin/users/:id
   def show
-    render inertia: 'Admin/Users/Show', props: {
+    render inertia: "Admin/Users/Show", props: {
       user: user_props(@user)
     }
   end
 
   # GET /admin/users/new
   def new
-    render inertia: 'Admin/Users/New'
+    render inertia: "Admin/Users/New"
   end
 
   # POST /admin/users
@@ -30,7 +30,7 @@ class Admin::UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      render json: { message: 'User created successfully', user: user_props(@user) }, status: :created
+      render json: { message: "User created successfully", user: user_props(@user) }, status: :created
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
@@ -38,7 +38,7 @@ class Admin::UsersController < ApplicationController
 
   # GET /admin/users/:id/edit
   def edit
-    render inertia: 'Admin/Users/Edit', props: {
+    render inertia: "Admin/Users/Edit", props: {
       user: user_props(@user)
     }
   end
@@ -46,7 +46,7 @@ class Admin::UsersController < ApplicationController
   # PATCH /admin/users/:id
   def update
     if @user.update(user_params)
-      render json: { message: 'User updated successfully', user: user_props(@user) }
+      render json: { message: "User updated successfully", user: user_props(@user) }
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
@@ -55,12 +55,12 @@ class Admin::UsersController < ApplicationController
   # DELETE /admin/users/:id
   def destroy
     if @user == current_user
-      render json: { error: 'Cannot delete yourself' }, status: :unprocessable_entity
+      render json: { error: "Cannot delete yourself" }, status: :unprocessable_entity
       return
     end
 
     @user.destroy
-    render json: { message: 'User deleted successfully' }
+    render json: { message: "User deleted successfully" }
   end
 
   private
@@ -75,7 +75,7 @@ class Admin::UsersController < ApplicationController
 
   def require_super_admin
     unless current_user.super_admin?
-      render json: { error: 'Unauthorized' }, status: :forbidden
+      render json: { error: "Unauthorized" }, status: :forbidden
     end
   end
 

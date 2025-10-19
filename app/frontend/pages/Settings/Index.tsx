@@ -54,6 +54,26 @@ export default function SettingsIndex({ auth, preferences = { sidebar_variant: '
     setTheme(selectedTheme as 'light' | 'dark' | 'system')
   }, [selectedTheme, setTheme])
 
+  // Update body background based on sidebar variant (for instant preview)
+  useEffect(() => {
+    const body = document.body
+    if (sidebarVariant === 'inset') {
+      body.setAttribute('data-sidebar-bg', 'true')
+    } else {
+      body.removeAttribute('data-sidebar-bg')
+    }
+  }, [sidebarVariant])
+
+  // Get display name for sidebar variant
+  const getSidebarVariantLabel = (value: string) => {
+    const labels: Record<string, string> = {
+      sidebar: 'Sidebar',
+      floating: 'Floating',
+      inset: 'Inset'
+    }
+    return labels[value] || value
+  }
+
   const handleSave = () => {
     setSaving(true)
     router.patch('/settings', {
@@ -75,7 +95,7 @@ export default function SettingsIndex({ auth, preferences = { sidebar_variant: '
         } as React.CSSProperties
       }
     >
-      <AppSidebar user={auth.user} variant={preferences.sidebar_variant} />
+      <AppSidebar user={auth.user} variant={sidebarVariant as 'sidebar' | 'floating' | 'inset'} />
       <SidebarInset>
         <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
           <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
@@ -115,45 +135,23 @@ export default function SettingsIndex({ auth, preferences = { sidebar_variant: '
                         <SelectTrigger id="theme">
                           <SelectValue placeholder="Select a theme" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="light">
-                            <div className="flex flex-col">
-                              <span className="font-medium">Light</span>
-                              <span className="text-xs text-muted-foreground">
-                                Light mode with bright colors
-                              </span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="dark">
-                            <div className="flex flex-col">
-                              <span className="font-medium">Dark</span>
-                              <span className="text-xs text-muted-foreground">
-                                Dark mode with muted colors
-                              </span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="system">
-                            <div className="flex flex-col">
-                              <span className="font-medium">System</span>
-                              <span className="text-xs text-muted-foreground">
-                                Follow system theme preferences
-                              </span>
-                            </div>
-                          </SelectItem>
+                        <SelectContent align="start">
+                          <SelectItem value="light">Light</SelectItem>
+                          <SelectItem value="dark">Dark</SelectItem>
+                          <SelectItem value="system">System</SelectItem>
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">
-                        Theme changes apply instantly
-                      </p>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="sidebar-variant">Sidebar Variant</Label>
                       <Select value={sidebarVariant} onValueChange={setSidebarVariant}>
                         <SelectTrigger id="sidebar-variant">
-                          <SelectValue placeholder="Select a variant" />
+                          <SelectValue placeholder="Select a variant">
+                            {getSidebarVariantLabel(sidebarVariant)}
+                          </SelectValue>
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="start">
                           <SelectItem value="sidebar">
                             <div className="flex flex-col">
                               <span className="font-medium">Sidebar</span>
@@ -180,9 +178,6 @@ export default function SettingsIndex({ auth, preferences = { sidebar_variant: '
                           </SelectItem>
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">
-                        Sidebar variant changes require a page refresh
-                      </p>
                     </div>
 
                     <div className="flex justify-end">

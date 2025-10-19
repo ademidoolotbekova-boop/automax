@@ -43,7 +43,7 @@ class User < ApplicationRecord
 
   # Role helper methods
   def admin_or_super_admin?
-    role == 'admin' || role == 'super_admin'
+    role == "admin" || role == "super_admin"
   end
 
   private

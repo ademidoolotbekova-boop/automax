@@ -28,7 +28,7 @@ module Services
         @user = User.find_by(email: email.downcase.strip)
 
         unless @user&.authenticate(password)
-          errors.add(:base, 'Invalid email or password')
+          errors.add(:base, "Invalid email or password")
         end
       end
     end

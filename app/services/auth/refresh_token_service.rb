@@ -28,7 +28,7 @@ module Services
         @refresh_token_record = JwtService.verify_refresh_token(refresh_token)
 
         unless @refresh_token_record
-          errors.add(:base, 'Invalid or expired refresh token')
+          errors.add(:base, "Invalid or expired refresh token")
         end
       end
     end

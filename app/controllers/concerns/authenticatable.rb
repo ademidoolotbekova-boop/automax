@@ -9,14 +9,14 @@ module Authenticatable
 
   def set_current_user
     @current_user = nil
-    token = request.headers['Authorization']&.split(' ')&.last
+    token = request.headers["Authorization"]&.split(" ")&.last
 
     return unless token
 
     decoded = Services::Auth::JwtService.decode(token)
     return unless decoded
 
-    @current_user = User.find_by(id: decoded['user_id'])
+    @current_user = User.find_by(id: decoded["user_id"])
   end
 
   def current_user
@@ -33,7 +33,7 @@ module Authenticatable
     current_user == user
   end
 
-  def render_unauthorized(message = 'Unauthorized')
+  def render_unauthorized(message = "Unauthorized")
     respond_to do |format|
       format.json { render json: { error: message }, status: :unauthorized }
       format.html do

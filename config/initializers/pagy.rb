@@ -1,4 +1,4 @@
-require 'pagy/extras/overflow'
+require "pagy/extras/overflow"
 
 # Pagy configuration
 Pagy::DEFAULT[:items] = 20

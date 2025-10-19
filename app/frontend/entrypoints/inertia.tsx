@@ -66,8 +66,10 @@ if (appElement) {
 
     // Setup the app
     setup({ el, App, props }) {
-      // Get initial theme from props (preferences)
-      const initialTheme = props.initialPage.props.preferences?.theme || 'system'
+      // Get initial theme from props (preferences) or localStorage cache
+      const serverTheme = props.initialPage.props.preferences?.theme
+      const cachedTheme = localStorage.getItem('ui-theme') as 'light' | 'dark' | 'system' | null
+      const initialTheme = serverTheme || cachedTheme || 'system'
 
       createRoot(el).render(
         <React.StrictMode>
@@ -81,7 +83,7 @@ if (appElement) {
     // Progress bar at top of page
     progress: {
       color: '#3b82f6',
-      showSpinner: true,
+      showSpinner: false,
     },
   })
 }

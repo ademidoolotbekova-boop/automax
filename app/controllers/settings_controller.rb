@@ -3,7 +3,7 @@ class SettingsController < ApplicationController
 
   # GET /settings
   def index
-    render inertia: 'Settings/Index'
+    render inertia: "Settings/Index"
   end
 
   # PATCH /settings
@@ -11,9 +11,9 @@ class SettingsController < ApplicationController
     preference = current_user.user_preference || current_user.build_user_preference
 
     if update_preference(preference)
-      redirect_to settings_path, notice: 'Settings updated successfully'
+      redirect_to settings_path, notice: "Settings updated successfully"
     else
-      render inertia: 'Settings/Index', props: {
+      render inertia: "Settings/Index", props: {
         errors: preference.errors.full_messages
       }, status: :unprocessable_entity
     end

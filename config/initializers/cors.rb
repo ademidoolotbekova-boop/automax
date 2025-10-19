@@ -3,26 +3,26 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # In development, allow localhost. In production, use ENV variable
     if Rails.env.production?
-      origins ENV['ALLOWED_ORIGINS']&.split(',') || []
+      origins ENV["ALLOWED_ORIGINS"]&.split(",") || []
     else
-      origins 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173'
+      origins "http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173"
     end
 
-    resource '/session*',
+    resource "/session*",
       headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
       credentials: true,
-      expose: ['Authorization']
+      expose: [ "Authorization" ]
 
-    resource '/password*',
+    resource "/password*",
       headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
       credentials: true
 
-    resource '/api/*',
+    resource "/api/*",
       headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
       credentials: true,
-      expose: ['Authorization']
+      expose: [ "Authorization" ]
   end
 end

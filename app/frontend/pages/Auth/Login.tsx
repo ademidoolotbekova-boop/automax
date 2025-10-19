@@ -29,14 +29,14 @@ export default function Login({ return_to }: LoginProps) {
           replace: true,
           onError: () => {
             // If the visit fails (e.g., 401), clear the invalid token
-            authService.clearToken()
+            authService.clearTokens()
             setIsCheckingAuth(false)
           },
         })
       } else {
         // No token or expired token
         if (token) {
-          authService.clearToken()
+          authService.clearTokens()
         }
         setIsCheckingAuth(false)
       }
@@ -80,7 +80,7 @@ export default function Login({ return_to }: LoginProps) {
   // Show loading state while checking authentication
   if (isCheckingAuth) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-950">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
       </div>
     )
