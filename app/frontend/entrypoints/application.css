@@ -124,4 +124,35 @@
   body[data-sidebar-bg] {
     background-color: var(--sidebar);
   }
+
+  /* Global cursor styles for clickable elements */
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  a,
+  label,
+  select,
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="switch"],
+  [role="combobox"],
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  /* Ensure disabled elements show not-allowed cursor */
+  button:disabled,
+  [role="button"][disabled],
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled,
+  a[disabled],
+  .cursor-not-allowed {
+    cursor: not-allowed;
+  }
 }

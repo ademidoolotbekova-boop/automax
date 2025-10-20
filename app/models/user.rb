@@ -1,6 +1,9 @@
 class User < ApplicationRecord
   has_secure_password
 
+  # Audit trail for tracking changes
+  audited
+
   # Associations
   has_many :refresh_tokens, dependent: :destroy
   has_one :user_preference, dependent: :destroy
@@ -18,6 +21,16 @@ class User < ApplicationRecord
 
   # Role constants
   ROLES = %w[user admin super_admin].freeze
+
+  # Ransack configuration - only allow searching on safe attributes
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id name email role super_admin created_at updated_at]
+  end
+
+  # Ransack associations - empty for now, add as needed
+  def self.ransackable_associations(auth_object = nil)
+    []
+  end
 
   # Password reset methods
   def generate_password_reset_token

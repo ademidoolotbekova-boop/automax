@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   # Admin routes (super_admin only)
   namespace :admin do
     resources :users
+    resources :audit_logs, only: [ :index ]
     get :dashboard, to: "dashboard#index"
   end
 

@@ -1,0 +1,522 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { router } from '@inertiajs/react'
+import pickBy from 'lodash/pickBy'
+import debounce from 'lodash/debounce'
+
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+  FileTextIcon,
+  SearchIcon,
+  XIcon,
+} from 'lucide-react'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/app-sidebar'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/ui/pagination'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
+
+import { cn } from '@/lib/utils'
+
+interface AuditLog {
+  id: number
+  action: string
+  auditable_type: string
+  auditable_id: number
+  user_id: number | null
+  user_name: string
+  user_email: string | null
+  audited_changes: Record<string, any>
+  created_at: string
+  remote_address: string | null
+}
+
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+  super_admin: boolean
+}
+
+interface Filters {
+  search?: string
+  action_filter?: string
+  sort_column?: string
+  sort_direction?: string
+}
+
+interface Pagination {
+  page: number
+  pages: number
+  count: number
+  from: number
+  to: number
+  prev: number | null
+  next: number | null
+}
+
+interface AdminAuditLogsIndexProps {
+  auth: {
+    user: User
+  }
+  preferences: {
+    sidebar_variant: 'sidebar' | 'floating' | 'inset'
+  }
+  audits: AuditLog[]
+  pagination: Pagination
+  filters: Filters
+}
+
+// Filter component with proper debouncing pattern
+const AuditLogsFilter = ({ filters, audits }: { filters: Filters; audits: AuditLog[] }) => {
+  const [search, setSearch] = useState(filters.search || '')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [isSearching, setIsSearching] = useState(false)
+
+  const debouncedSearch = useCallback(
+    debounce((searchValue: string) => {
+      router.get(
+        '/admin/audit_logs',
+        pickBy({
+          search: searchValue,
+          action_filter: filters.action_filter,
+          sort_column: filters.sort_column,
+          sort_direction: filters.sort_direction,
+        }),
+        {
+          preserveState: true,
+          preserveScroll: true,
+          replace: true,
+          onSuccess: () => {
+            setIsSearching(false)
+          },
+        }
+      )
+    }, 300),
+    [filters.action_filter, filters.sort_column, filters.sort_direction]
+  )
+
+  // Restore focus after Inertia re-render
+  useEffect(() => {
+    if (isSearching && searchInputRef.current && document.activeElement !== searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }, [audits, isSearching])
+
+  useEffect(() => {
+    return () => debouncedSearch.cancel()
+  }, [debouncedSearch])
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearch(value)
+    setIsSearching(true)
+    debouncedSearch(value)
+  }
+
+  const clearSearch = () => {
+    setSearch('')
+    setIsSearching(true)
+    debouncedSearch('')
+  }
+
+  const handleActionFilter = (value: string) => {
+    router.get(
+      '/admin/audit_logs',
+      pickBy({
+        search,
+        action_filter: value === 'all' ? '' : value,
+        sort_column: filters.sort_column,
+        sort_direction: filters.sort_direction,
+      }),
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+      }
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-4 p-6">
+      <span className="text-xl font-semibold">Filter Logs</span>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="w-full space-y-2">
+          <Label htmlFor="search">Search by User Name or Email</Label>
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              ref={searchInputRef}
+              id="search"
+              type="text"
+              placeholder="Search audit logs..."
+              value={search}
+              onChange={handleSearchChange}
+              className={cn("pl-9", search && "pr-9")}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <XIcon className="size-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="w-full space-y-2">
+          <Label htmlFor="action-filter">Select Action</Label>
+          <Select value={filters.action_filter || 'all'} onValueChange={handleActionFilter}>
+            <SelectTrigger id="action-filter" className="w-full capitalize">
+              <SelectValue placeholder="Select Action" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="create">Created</SelectItem>
+              <SelectItem value="update">Updated</SelectItem>
+              <SelectItem value="destroy">Deleted</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function AdminAuditLogsIndex({
+  auth,
+  preferences,
+  audits,
+  pagination,
+  filters,
+}: AdminAuditLogsIndexProps) {
+
+  const handleSort = (column: string) => {
+    const isCurrentColumn = filters.sort_column === column
+    const newDirection = isCurrentColumn && filters.sort_direction === 'asc' ? 'desc' : 'asc'
+
+    router.get(
+      '/admin/audit_logs',
+      {
+        ...filters,
+        sort_column: column,
+        sort_direction: newDirection,
+      },
+      {
+        preserveState: true,
+        preserveScroll: true,
+      }
+    )
+  }
+
+  const handlePageChange = (page: number) => {
+    router.get(
+      '/admin/audit_logs',
+      {
+        ...filters,
+        page,
+      },
+      {
+        preserveState: true,
+        preserveScroll: true,
+      }
+    )
+  }
+
+  const getSortIcon = (column: string) => {
+    if (filters.sort_column !== column) return null
+
+    return filters.sort_direction === 'asc' ? (
+      <ChevronUpIcon className="shrink-0 opacity-60" size={16} aria-hidden="true" />
+    ) : (
+      <ChevronDownIcon className="shrink-0 opacity-60" size={16} aria-hidden="true" />
+    )
+  }
+
+  const getActionBadge = (action: string) => {
+    const badges = {
+      create: { variant: 'default' as const, label: 'Created', color: 'bg-green-600/10 text-green-600 dark:bg-green-400/10 dark:text-green-400' },
+      update: { variant: 'secondary' as const, label: 'Updated', color: 'bg-blue-600/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400' },
+      destroy: { variant: 'destructive' as const, label: 'Deleted', color: 'bg-destructive/10 text-destructive' },
+    }
+
+    const badge = badges[action as keyof typeof badges] || { variant: 'outline' as const, label: action, color: '' }
+
+    return (
+      <Badge className={cn('border-none capitalize focus-visible:outline-none', badge.color)}>
+        {badge.label}
+      </Badge>
+    )
+  }
+
+  const renderChanges = (changes: Record<string, any>) => {
+    const changeKeys = Object.keys(changes).filter(key => key !== 'password_digest' && key !== 'updated_at')
+
+    if (changeKeys.length === 0) return <span className="text-muted-foreground text-sm">No changes</span>
+
+    return (
+      <div className="text-sm space-y-1">
+        {changeKeys.slice(0, 3).map((key) => (
+          <div key={key} className="text-muted-foreground">
+            <span className="font-medium">{key}:</span>{' '}
+            {Array.isArray(changes[key]) ? (
+              <>
+                <span className="text-destructive line-through">{String(changes[key][0])}</span>
+                {' → '}
+                <span className="text-green-600 dark:text-green-400">{String(changes[key][1])}</span>
+              </>
+            ) : (
+              String(changes[key])
+            )}
+          </div>
+        ))}
+        {changeKeys.length > 3 && (
+          <div className="text-muted-foreground text-xs">+{changeKeys.length - 3} more changes</div>
+        )}
+      </div>
+    )
+  }
+
+  const renderPagination = () => {
+    if (pagination.pages <= 1) return null
+
+    const pages = []
+    const maxPagesToShow = 5
+    let startPage = Math.max(1, pagination.page - Math.floor(maxPagesToShow / 2))
+    let endPage = Math.min(pagination.pages, startPage + maxPagesToShow - 1)
+
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1)
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i)
+    }
+
+    return (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <Button
+              className="disabled:pointer-events-none disabled:opacity-50"
+              variant="ghost"
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={!pagination.prev}
+              aria-label="Go to previous page"
+            >
+              <ChevronLeftIcon size={16} aria-hidden="true" />
+              Previous
+            </Button>
+          </PaginationItem>
+
+          {startPage > 1 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+
+          {pages.map((page) => {
+            const isActive = page === pagination.page
+
+            return (
+              <PaginationItem key={page}>
+                <Button
+                  size="icon"
+                  className={`${!isActive && 'bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 dark:focus-visible:ring-primary/40'}`}
+                  onClick={() => handlePageChange(page)}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {page}
+                </Button>
+              </PaginationItem>
+            )
+          })}
+
+          {endPage < pagination.pages && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+
+          <PaginationItem>
+            <Button
+              className="disabled:pointer-events-none disabled:opacity-50"
+              variant="ghost"
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={!pagination.next}
+              aria-label="Go to next page"
+            >
+              Next
+              <ChevronRightIcon size={16} aria-hidden="true" />
+            </Button>
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    )
+  }
+
+  return (
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': 'calc(var(--spacing) * 72)',
+          '--header-height': 'calc(var(--spacing) * 12)',
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar user={auth.user} variant={preferences.sidebar_variant} />
+      <SidebarInset>
+        <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+          <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/admin/dashboard">Super Admin Panel</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Audit Logs</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <div className="px-4 lg:px-6">
+                <Card className="from-primary/5 to-card bg-gradient-to-t shadow-xs">
+                  <CardHeader>
+                    <CardTitle>Audit Logs ({pagination.count})</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="w-full">
+                      <div className="border-b">
+                        <AuditLogsFilter filters={filters} audits={audits} />
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="h-14 border-t">
+                              <TableHead className="text-muted-foreground first:pl-4">
+                                <div
+                                  className="flex h-full cursor-pointer items-center justify-between gap-2 select-none"
+                                  onClick={() => handleSort('created_at')}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault()
+                                      handleSort('created_at')
+                                    }
+                                  }}
+                                  tabIndex={0}
+                                >
+                                  Timestamp
+                                  {getSortIcon('created_at')}
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-muted-foreground">
+                                <div
+                                  className="flex h-full cursor-pointer items-center justify-between gap-2 select-none"
+                                  onClick={() => handleSort('action')}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault()
+                                      handleSort('action')
+                                    }
+                                  }}
+                                  tabIndex={0}
+                                >
+                                  Action
+                                  {getSortIcon('action')}
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-muted-foreground">User</TableHead>
+                              <TableHead className="text-muted-foreground">Resource</TableHead>
+                              <TableHead className="text-muted-foreground">Changes</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {audits.length > 0 ? (
+                              audits.map((audit) => (
+                                <TableRow key={audit.id} className="hover:bg-transparent">
+                                  <TableCell className="h-14 first:pl-4">
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">
+                                        {new Date(audit.created_at).toLocaleDateString()}
+                                      </span>
+                                      <span className="text-muted-foreground text-xs">
+                                        {new Date(audit.created_at).toLocaleTimeString()}
+                                      </span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="h-14">{getActionBadge(audit.action)}</TableCell>
+                                  <TableCell className="h-14">
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{audit.user_name}</span>
+                                      {audit.user_email && (
+                                        <span className="text-muted-foreground text-xs">{audit.user_email}</span>
+                                      )}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="h-14">
+                                    <div className="flex items-center gap-2">
+                                      <FileTextIcon className="size-4 text-muted-foreground" />
+                                      <span className="text-muted-foreground">
+                                        {audit.auditable_type} #{audit.auditable_id}
+                                      </span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="h-14">{renderChanges(audit.audited_changes)}</TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={5} className="h-24 text-center">
+                                  No audit logs found.
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3 px-6 py-4 max-sm:flex-col md:max-lg:flex-col">
+                        <p className="text-muted-foreground text-sm whitespace-nowrap" aria-live="polite">
+                          Showing <span>{pagination.from || 0}</span> to <span>{pagination.to || 0}</span> of{' '}
+                          <span>{pagination.count} logs</span>
+                        </p>
+
+                        <div>{renderPagination()}</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
+}

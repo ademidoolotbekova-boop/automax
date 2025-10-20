@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include Authenticatable
   include Pagy::Backend
+  include Pundit::Authorization
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -33,6 +34,18 @@ class ApplicationController < ActionController::Base
     {
       sidebar_variant: preference.sidebar_variant,
       theme: preference.theme
+    }
+  end
+
+  def pagination_props(pagy)
+    {
+      page: pagy.page,
+      pages: pagy.pages,
+      count: pagy.count,
+      from: pagy.from,
+      to: pagy.to,
+      prev: pagy.prev,
+      next: pagy.next
     }
   end
 end

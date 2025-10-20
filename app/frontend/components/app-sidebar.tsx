@@ -5,6 +5,7 @@ import {
   UsersIcon,
   SettingsIcon,
   LogOutIcon,
+  FileTextIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -47,12 +48,17 @@ export function AppSidebar({ user, variant = "sidebar", ...props }: AppSidebarPr
     },
   ]
 
-  // Add admin panel link for super admins
+  // Add admin panel links for super admins
   if (user.super_admin) {
     navMain.push({
       title: "Super Admin Panel",
       url: "/admin/dashboard",
       icon: UsersIcon,
+    })
+    navMain.push({
+      title: "Audit Logs",
+      url: "/admin/audit_logs",
+      icon: FileTextIcon,
     })
   }
 

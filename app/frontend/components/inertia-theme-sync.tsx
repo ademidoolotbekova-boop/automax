@@ -1,3 +1,16 @@
+/**
+ * ⚠️ WARNING: This component is NOT IN USE and should NOT be used as a wrapper.
+ *
+ * REASON: Using usePage() as a wrapper causes re-renders on EVERY Inertia request,
+ * which breaks input focus during typing (e.g., search fields, forms).
+ *
+ * ALTERNATIVE: Theme and preferences are initialized once in entrypoints/inertia.tsx
+ * setup() function instead. This prevents unnecessary re-renders while maintaining
+ * proper theme synchronization.
+ *
+ * DO NOT wrap page components with this unless you fully understand the trade-offs.
+ */
+
 import React, { useEffect } from 'react'
 import { usePage } from '@inertiajs/react'
 import { useTheme } from './theme-provider'

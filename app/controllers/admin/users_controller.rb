@@ -1,66 +1,108 @@
-class Admin::UsersController < ApplicationController
-  before_action :authenticate_user!
-  before_action :require_super_admin
+class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: [ :show, :edit, :update, :destroy ]
 
-  # GET /admin/users
+  after_action :verify_authorized, except: :index
+  after_action :verify_policy_scoped, only: :index
+
   def index
-    @pagy, @users = pagy(User.order(created_at: :desc), items: 20)
+    # Build search query with Ransack
+    search_params = params[:q] || {}
+
+    # Add search term if provided
+    if params[:search].present?
+      search_params = search_params.merge(
+        name_or_email_cont: params[:search]
+      )
+    end
+
+    # Add sorting - default to created_at desc
+    sort_column = params[:sort] || "created_at"
+    sort_direction = params[:direction] || "desc"
+    search_params = search_params.merge(s: "#{sort_column} #{sort_direction}")
+
+    @q = policy_scope(User).ransack(search_params)
+    @users = @q.result
+
+    # Filter by role
+    if params[:role].present?
+      if params[:role] == "super_admin"
+        @users = @users.where(super_admin: true)
+      else
+        @users = @users.where(role: params[:role], super_admin: false)
+      end
+    end
+
+    @pagy, @users = pagy(@users, items: 20)
 
     render inertia: "Admin/Users/Index", props: {
       users: @users.map { |u| user_props(u) },
-      pagination: pagination_props(@pagy)
+      pagination: pagination_props(@pagy),
+      filters: {
+        search: params[:search].presence,
+        role: params[:role].presence,
+        sort: sort_column,
+        direction: sort_direction
+      }
     }
   end
 
-  # GET /admin/users/:id
   def show
+    authorize @user
     render inertia: "Admin/Users/Show", props: {
       user: user_props(@user)
     }
   end
 
-  # GET /admin/users/new
   def new
+    @user = User.new
+    authorize @user
     render inertia: "Admin/Users/New"
   end
 
-  # POST /admin/users
   def create
     @user = User.new(user_params)
+    authorize @user
 
     if @user.save
-      render json: { message: "User created successfully", user: user_props(@user) }, status: :created
+      redirect_to admin_users_path, notice: "User was successfully created."
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render inertia: "Admin/Users/New", props: {
+        errors: @user.errors.messages,
+        user: @user.attributes
+      }
     end
   end
 
-  # GET /admin/users/:id/edit
   def edit
+    authorize @user
     render inertia: "Admin/Users/Edit", props: {
       user: user_props(@user)
     }
   end
 
-  # PATCH /admin/users/:id
   def update
+    authorize @user
     if @user.update(user_params)
-      render json: { message: "User updated successfully", user: user_props(@user) }
+      redirect_to admin_users_path, notice: "User was successfully updated."
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render inertia: "Admin/Users/Edit", props: {
+        errors: @user.errors.messages,
+        user: user_props(@user)
+      }
     end
   end
 
-  # DELETE /admin/users/:id
   def destroy
-    if @user == current_user
-      render json: { error: "Cannot delete yourself" }, status: :unprocessable_entity
-      return
-    end
+    authorize @user
 
-    @user.destroy
-    render json: { message: "User deleted successfully" }
+    begin
+      @user.destroy!
+      redirect_to admin_users_path, notice: "User was successfully deleted."
+    rescue => e
+      Rails.logger.error "Failed to delete user: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      redirect_to admin_users_path, alert: "Failed to delete user: #{e.message}"
+    end
   end
 
   private
@@ -70,16 +112,8 @@ class Admin::UsersController < ApplicationController
   end
 
   def user_params
-    # Only allow basic user attributes and role
-    # super_admin cannot be set via mass assignment for security
-    # (must be set manually via console/seeds)
-    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
-  end
-
-  def require_super_admin
-    unless current_user.super_admin?
-      render json: { error: "Unauthorized" }, status: :forbidden
-    end
+    permitted_attrs = policy(@user || User).permitted_attributes
+    params.require(:user).permit(*permitted_attrs)
   end
 
   def user_props(user)
@@ -88,21 +122,8 @@ class Admin::UsersController < ApplicationController
       name: user.name,
       email: user.email,
       role: user.role,
-      super_admin: user.super_admin?,
-      created_at: user.created_at,
-      updated_at: user.updated_at
-    }
-  end
-
-  def pagination_props(pagy)
-    {
-      page: pagy.page,
-      pages: pagy.pages,
-      count: pagy.count,
-      from: pagy.from,
-      to: pagy.to,
-      prev: pagy.prev,
-      next: pagy.next
+      super_admin: user.super_admin,
+      created_at: user.created_at.iso8601
     }
   end
 end

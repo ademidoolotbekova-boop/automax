@@ -1,8 +1,8 @@
-class Admin::DashboardController < ApplicationController
-  before_action :authenticate_user!
-  before_action :require_super_admin
+class Admin::DashboardController < Admin::BaseController
+  after_action :verify_authorized
 
   def index
+    authorize :dashboard, :index?
     render inertia: "Admin/Dashboard", props: {
       stats: {
         total_users: User.count,
@@ -12,13 +12,5 @@ class Admin::DashboardController < ApplicationController
         active_sessions: RefreshToken.active.count
       }
     }
-  end
-
-  private
-
-  def require_super_admin
-    unless current_user.super_admin?
-      render json: { error: "Unauthorized" }, status: :forbidden
-    end
   end
 end

@@ -34,6 +34,9 @@ gem "pundit", "~> 2.4"
 # Pagination
 gem "pagy", "~> 9.3"
 
+# Search
+gem "ransack"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
@@ -72,6 +75,8 @@ group :development, :test do
   gem "faker", "~> 3.5"
   # Annotates Rails/ActiveRecord Models based on the database schema
   gem "annotaterb", "~> 4.14"
+  # Audit trail for ActiveRecord models
+  gem "audited", "~> 5.6"
 
   # Load environment variables from .env file
   gem "dotenv-rails", "~> 3.1"
