@@ -19,7 +19,7 @@ interface User {
   id: number
   name: string
   email: string
-  owner: boolean
+  admin: boolean
 }
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {

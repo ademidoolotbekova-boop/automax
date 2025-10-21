@@ -43,7 +43,7 @@ export function NavUser({
     name: string
     email: string
     avatar_url?: string | null
-    owner?: boolean
+    admin?: boolean
   }
 }) {
   const { isMobile } = useSidebar()
@@ -132,10 +132,10 @@ export function NavUser({
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              {user.owner && (
+              {user.admin && (
                 <DropdownMenuItem onClick={() => router.visit('/admin/console')}>
                   <UsersIcon />
-                  Owner Console
+                  Admin Console
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>

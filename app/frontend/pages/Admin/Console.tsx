@@ -14,7 +14,7 @@ interface User {
   id: number
   name: string
   email: string
-  owner: boolean
+  admin: boolean
 }
 
 interface AdminConsoleProps {
@@ -23,7 +23,7 @@ interface AdminConsoleProps {
   }
   stats: {
     total_users: number
-    owners: number
+    admins: number
     regular_users: number
     active_sessions: number
   }
@@ -39,7 +39,7 @@ export default function AdminConsole({ auth, stats }: AdminConsoleProps) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbPage>Owner Panel</BreadcrumbPage>
+                <BreadcrumbPage>Admin Panel</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -74,9 +74,9 @@ export default function AdminConsole({ auth, stats }: AdminConsoleProps) {
 
               <Card className="@container/card">
                 <CardHeader>
-                  <CardDescription>Owners</CardDescription>
+                  <CardDescription>Admins</CardDescription>
                   <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    {stats.owners}
+                    {stats.admins}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex-col items-start gap-1.5 text-sm">

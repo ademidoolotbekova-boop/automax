@@ -7,14 +7,14 @@ module Invitations
     validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
     validates :name, presence: true, length: { minimum: 2, maximum: 100 }
 
-    validate :user_must_be_owner
+    validate :user_must_be_admin
     validate :email_must_not_exist
 
     def execute
       user = User.new(
         email: email.downcase.strip,
         name: name,
-        owner: false
+        admin: false
       )
 
       if user.save(validate: false)
@@ -29,8 +29,8 @@ module Invitations
 
     private
 
-    def user_must_be_owner
-      errors.add(:current_user, "must be an owner") unless current_user&.owner?
+    def user_must_be_admin
+      errors.add(:current_user, "must be an admin") unless current_user&.admin?
     end
 
     def email_must_not_exist

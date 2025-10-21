@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Admin::Console", type: :request do
   let(:regular_user) { create(:user) }
-  let(:owner_user) { create(:user, :owner) }
+  let(:admin_user) { create(:user, :admin) }
 
   describe "GET /admin/console" do
     context "when not authenticated" do
@@ -24,16 +24,16 @@ RSpec.describe "Admin::Console", type: :request do
     context "when authenticated as super admin" do
       before do
         create_list(:user, 3)
-        create(:user, :owner)
+        create(:user, :admin)
       end
 
       it "returns success" do
-        get admin_console_path, headers: auth_headers(owner_user)
+        get admin_console_path, headers: auth_headers(admin_user)
         expect(response).to have_http_status(:success)
       end
 
       it "includes stats in response" do
-        get admin_console_path, headers: auth_headers(owner_user)
+        get admin_console_path, headers: auth_headers(admin_user)
         expect(response).to have_http_status(:success)
         # Stats should be in Inertia props, but we can verify response is successful
       end

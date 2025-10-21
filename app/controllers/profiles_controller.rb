@@ -37,7 +37,7 @@ class ProfilesController < ApplicationController
       id: user.id,
       name: user.name,
       email: user.email,
-      owner: user.owner?,
+      admin: user.admin?,
       created_at: user.created_at,
       avatar_url: avatar_url
     }

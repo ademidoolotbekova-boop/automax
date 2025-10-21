@@ -60,7 +60,7 @@ class SessionsController < ApplicationController
       id: user.id,
       name: user.name,
       email: user.email,
-      owner: user.owner?
+      admin: user.admin?
     }
   end
 end

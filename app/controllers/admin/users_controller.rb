@@ -79,8 +79,8 @@ class Admin::UsersController < Admin::BaseController
   def update
     authorize @user
 
-    # Only allow updating name and owner status, not password
-    update_params = params.require(:user).permit(:name, :owner)
+    # Only allow updating name and admin status, not password
+    update_params = params.require(:user).permit(:name, :admin)
 
     if @user.update(update_params)
       redirect_to admin_users_path, notice: "User was successfully updated."
@@ -137,7 +137,7 @@ class Admin::UsersController < Admin::BaseController
       id: user.id,
       name: user.name,
       email: user.email,
-      owner: user.owner,
+      admin: user.admin,
       created_at: user.created_at.iso8601,
       invitation_pending: user.invitation_pending?,
       invitation_accepted: user.invitation_accepted?,

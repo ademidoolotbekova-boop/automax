@@ -38,7 +38,7 @@ interface User {
   id: number
   name: string
   email: string
-  owner: boolean
+  admin: boolean
   created_at: string
   invitation_pending: boolean
   invitation_accepted: boolean
@@ -251,7 +251,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Admin Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -354,7 +354,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
                                         <div className="flex flex-col">
                                           <div className="flex items-center gap-2">
                                             <span className="font-medium">{user.name}</span>
-                                            {user.owner && (
+                                            {user.admin && (
                                               <CrownIcon className="size-3.5 text-amber-600 dark:text-amber-400" />
                                             )}
                                           </div>

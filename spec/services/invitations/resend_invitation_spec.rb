@@ -3,15 +3,15 @@ require "rails_helper"
 RSpec.describe Invitations::ResendInvitation, type: :service do
   include ActiveSupport::Testing::TimeHelpers
 
-  let(:owner) { create(:user, owner: true) }
-  let(:regular_user) { create(:user, owner: false) }
+  let(:admin_user) { create(:user, admin: true) }
+  let(:regular_user) { create(:user, admin: false) }
   let(:invited_user) { create(:user, :invited) }
 
   describe "#execute" do
     context "with valid parameters" do
       let(:valid_params) do
         {
-          current_user: owner,
+          current_user: admin_user,
           user_id: invited_user.id
         }
       end
@@ -64,7 +64,7 @@ RSpec.describe Invitations::ResendInvitation, type: :service do
     context "with invalid parameters" do
       it "fails when user_id is blank" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           user_id: nil
         )
 
@@ -74,7 +74,7 @@ RSpec.describe Invitations::ResendInvitation, type: :service do
 
       it "fails when user_id doesn't exist" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           user_id: 99999
         )
 
@@ -84,14 +84,14 @@ RSpec.describe Invitations::ResendInvitation, type: :service do
     end
 
     context "authorization" do
-      it "fails when current_user is not an owner" do
+      it "fails when current_user is not an admin" do
         outcome = described_class.run(
           current_user: regular_user,
           user_id: invited_user.id
         )
 
         expect(outcome).not_to be_valid
-        expect(outcome.errors[:current_user]).to include("must be an owner")
+        expect(outcome.errors[:current_user]).to include("must be an admin")
       end
     end
 
@@ -100,7 +100,7 @@ RSpec.describe Invitations::ResendInvitation, type: :service do
 
       it "fails when user doesn't have pending invitation" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           user_id: active_user.id
         )
 
@@ -112,7 +112,7 @@ RSpec.describe Invitations::ResendInvitation, type: :service do
         invited_user.update_columns(invitation_accepted_at: Time.current)
 
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           user_id: invited_user.id
         )
 

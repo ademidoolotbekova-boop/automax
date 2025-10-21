@@ -20,7 +20,7 @@ interface User {
   id: number
   name: string
   email: string
-  owner: boolean
+  admin: boolean
   created_at: string
   invitation_pending: boolean
   invitation_accepted: boolean
@@ -36,9 +36,9 @@ interface AdminUserShowProps {
 
 export default function AdminUserShow({ auth, user }: AdminUserShowProps) {
   const getRoleInfo = () => {
-    if (user.owner) {
+    if (user.admin) {
       return {
-        label: 'Owner',
+        label: 'Admin',
         icon: <CrownIcon className="size-4" />,
         variant: 'default' as const,
         color: 'text-amber-600 dark:text-amber-400',
@@ -71,7 +71,7 @@ export default function AdminUserShow({ auth, user }: AdminUserShowProps) {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Admin Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>

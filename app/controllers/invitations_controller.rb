@@ -39,7 +39,7 @@ class InvitationsController < ApplicationController
           id: user.id,
           name: user.name,
           email: user.email,
-          owner: user.owner?,
+          admin: user.admin?,
           avatar_url: user.avatar.attached? ? url_for(user.avatar) : nil
         },
         jwt_token: jwt_token,

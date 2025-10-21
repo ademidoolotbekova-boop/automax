@@ -5,7 +5,7 @@ module Invitations
 
     validates :user_id, presence: true
 
-    validate :current_user_must_be_owner
+    validate :current_user_must_be_admin
     validate :invited_user_must_exist
     validate :invitation_must_be_pending
 
@@ -18,8 +18,8 @@ module Invitations
 
     private
 
-    def current_user_must_be_owner
-      errors.add(:current_user, "must be an owner") unless current_user&.owner?
+    def current_user_must_be_admin
+      errors.add(:current_user, "must be an admin") unless current_user&.admin?
     end
 
     def invited_user_must_exist

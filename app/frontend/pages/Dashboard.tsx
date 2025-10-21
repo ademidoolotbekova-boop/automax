@@ -14,7 +14,7 @@ interface DashboardProps {
       id: number
       name: string
       email: string
-      owner: boolean
+      admin: boolean
     }
   }
 }
@@ -51,9 +51,9 @@ export default function Dashboard({ auth }: DashboardProps) {
                     <div className="text-muted-foreground">
                       Email: {auth.user.email}
                     </div>
-                    {auth.user.owner && (
+                    {auth.user.admin && (
                       <div className="text-muted-foreground">
-                        Owner
+                        Admin
                       </div>
                     )}
                   </CardContent>

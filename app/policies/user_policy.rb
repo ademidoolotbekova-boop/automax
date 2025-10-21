@@ -1,7 +1,7 @@
 class UserPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.owner?
+      if user.admin?
         scope.all
       else
         scope.where(id: user.id)
@@ -10,15 +10,15 @@ class UserPolicy < ApplicationPolicy
   end
 
   def index?
-    user.owner?
+    user.admin?
   end
 
   def show?
-    user.owner? || record.id == user.id
+    user.admin? || record.id == user.id
   end
 
   def create?
-    user.owner?
+    user.admin?
   end
 
   def new?
@@ -26,7 +26,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    user.owner? || record.id == user.id
+    user.admin? || record.id == user.id
   end
 
   def edit?
@@ -34,11 +34,11 @@ class UserPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.owner? && record.id != user.id
+    user.admin? && record.id != user.id
   end
 
   def resend_invitation?
-    user.owner?
+    user.admin?
   end
 
   def permitted_attributes_for_create

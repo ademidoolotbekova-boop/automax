@@ -70,7 +70,7 @@ RSpec.describe "Invitations", type: :request do
         expect(json["user"]["id"]).to eq(invited_user.id)
         expect(json["user"]["name"]).to eq(invited_user.name)
         expect(json["user"]["email"]).to eq(invited_user.email)
-        expect(json["user"]["owner"]).to eq(invited_user.owner)
+        expect(json["user"]["admin"]).to eq(invited_user.admin)
       end
 
       it "returns JWT token" do

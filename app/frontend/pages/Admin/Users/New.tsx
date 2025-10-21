@@ -22,7 +22,7 @@ interface User {
   id: number
   name: string
   email: string
-  owner: boolean
+  admin: boolean
 }
 
 interface AdminUserNewProps {
@@ -60,7 +60,7 @@ export default function AdminUserNew({ auth, errors }: AdminUserNewProps) {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Admin Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>

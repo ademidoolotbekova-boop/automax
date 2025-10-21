@@ -76,7 +76,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_21_132357) do
     t.string "email", null: false
     t.string "name", null: false
     t.string "password_digest"
-    t.boolean "owner", default: false, null: false
+    t.boolean "admin", default: false, null: false
     t.string "reset_password_token"
     t.string "reset_password_digest"
     t.datetime "reset_password_sent_at"

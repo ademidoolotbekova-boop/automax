@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
           id: current_user.id,
           name: current_user.name,
           email: current_user.email,
-          owner: current_user.owner?,
+          admin: current_user.admin?,
           avatar_url: current_user.avatar.attached? ? url_for(current_user.avatar) : nil
         } : nil
       },

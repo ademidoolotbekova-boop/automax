@@ -52,7 +52,7 @@ interface User {
   name: string
   email: string
   role: string
-  owner: boolean
+  admin: boolean
 }
 
 interface Filters {
@@ -379,7 +379,7 @@ export default function AdminAuditLogsIndex({
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Admin Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>

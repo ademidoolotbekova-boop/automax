@@ -2,6 +2,6 @@
 
 class ConsolePolicy < ApplicationPolicy
   def index?
-    user.owner?
+    user.admin?
   end
 end

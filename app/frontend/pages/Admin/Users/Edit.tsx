@@ -22,7 +22,7 @@ interface User {
   id: number
   name: string
   email: string
-  owner: boolean
+  admin: boolean
   created_at: string
 }
 
@@ -42,7 +42,7 @@ const userEditSchema = z.object({
 
 type UserEditFormData = z.infer<typeof userEditSchema>
 
-export default function AdminUserEdit({ auth, user, errors }: AdminUserEditProps) {
+export default function AdminUserEdit({ user, errors }: AdminUserEditProps) {
   const { register, handleSubmit, formState: { errors: formErrors, isSubmitting } } = useForm<UserEditFormData>({
     resolver: zodResolver(userEditSchema),
     defaultValues: {
@@ -63,7 +63,7 @@ export default function AdminUserEdit({ auth, user, errors }: AdminUserEditProps
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Admin Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>

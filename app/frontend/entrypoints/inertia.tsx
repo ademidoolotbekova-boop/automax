@@ -37,7 +37,7 @@ if (appElement) {
   // Check and migrate localStorage tokens if needed
   // This helps when we rename fields in the user model (e.g., super_admin -> owner)
   const authVersion = localStorage.getItem('auth_version')
-  const currentVersion = '2.0' // Increment this when user model structure changes
+  const currentVersion = '3.0' // Increment this when user model structure changes
 
   if (authVersion !== currentVersion) {
     // Clear old tokens when version mismatch

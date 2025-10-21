@@ -5,7 +5,7 @@ module Audited
   class AuditPolicy < ApplicationPolicy
     class Scope < ApplicationPolicy::Scope
       def resolve
-        if user.owner?
+        if user.admin?
           scope.all
         else
           scope.none
@@ -14,7 +14,7 @@ module Audited
     end
 
     def index?
-      user.owner?
+      user.admin?
     end
   end
 end

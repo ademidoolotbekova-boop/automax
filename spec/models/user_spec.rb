@@ -3,10 +3,13 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
+#  admin                  :boolean          default(FALSE), not null
 #  email                  :string           not null
+#  invitation_accepted_at :datetime
+#  invitation_sent_at     :datetime
+#  invitation_token       :string
 #  name                   :string           not null
-#  owner                  :boolean          default(FALSE), not null
-#  password_digest        :string           not null
+#  password_digest        :string
 #  reset_password_digest  :string
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
@@ -15,7 +18,8 @@
 #
 # Indexes
 #
-#  index_users_on_email  (email) UNIQUE
+#  index_users_on_email             (email) UNIQUE
+#  index_users_on_invitation_token  (invitation_token) UNIQUE
 #
 require 'rails_helper'
 
@@ -39,17 +43,17 @@ RSpec.describe User, type: :model do
     it { should have_many(:refresh_tokens).dependent(:destroy) }
   end
 
-  describe 'owner flag' do
+  describe 'admin flag' do
     let(:user) { create(:user) }
-    let(:owner) { create(:user, :owner) }
+    let(:admin) { create(:user, :admin) }
 
-    describe '#owner?' do
-      it 'returns true for super admins' do
-        expect(owner.owner?).to be true
+    describe '#admin?' do
+      it 'returns true for admins' do
+        expect(admin.admin?).to be true
       end
 
       it 'returns false for regular users' do
-        expect(user.owner?).to be false
+        expect(user.admin?).to be false
       end
     end
   end

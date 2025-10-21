@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ConsolePolicy, type: :policy do
   let(:regular_user) { create(:user) }
-  let(:owner_user) { create(:user, :owner) }
+  let(:admin_user) { create(:user, :admin) }
 
   describe "#index?" do
     it "denies access for regular users" do
@@ -10,7 +10,7 @@ RSpec.describe ConsolePolicy, type: :policy do
     end
 
     it "grants access for super admin users" do
-      expect(ConsolePolicy.new(owner_user, :console).index?).to be true
+      expect(ConsolePolicy.new(admin_user, :console).index?).to be true
     end
   end
 end

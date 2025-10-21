@@ -3,10 +3,13 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
+#  admin                  :boolean          default(FALSE), not null
 #  email                  :string           not null
+#  invitation_accepted_at :datetime
+#  invitation_sent_at     :datetime
+#  invitation_token       :string
 #  name                   :string           not null
-#  owner                  :boolean          default(FALSE), not null
-#  password_digest        :string           not null
+#  password_digest        :string
 #  reset_password_digest  :string
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
@@ -15,7 +18,8 @@
 #
 # Indexes
 #
-#  index_users_on_email  (email) UNIQUE
+#  index_users_on_email             (email) UNIQUE
+#  index_users_on_invitation_token  (invitation_token) UNIQUE
 #
 class User < ApplicationRecord
   has_secure_password validations: false
@@ -44,7 +48,7 @@ class User < ApplicationRecord
 
   # Ransack configuration - only allow searching on safe attributes
   def self.ransackable_attributes(auth_object = nil)
-    %w[id name email owner created_at updated_at]
+    %w[id name email admin created_at updated_at]
   end
 
   # Ransack associations - empty for now, add as needed

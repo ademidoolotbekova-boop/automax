@@ -1,14 +1,14 @@
 require "rails_helper"
 
 RSpec.describe Invitations::SendInvitation, type: :service do
-  let!(:owner) { create(:user, owner: true) }
-  let!(:regular_user) { create(:user, owner: false) }
+  let!(:admin_user) { create(:user, admin: true) }
+  let!(:regular_user) { create(:user, admin: false) }
 
   describe "#execute" do
     context "with valid parameters" do
       let(:valid_params) do
         {
-          current_user: owner,
+          current_user: admin_user,
           email: "newuser@example.com",
           name: "New User"
         }
@@ -35,9 +35,9 @@ RSpec.describe Invitations::SendInvitation, type: :service do
         expect(outcome.result.email).to eq("newuser@example.com")
       end
 
-      it "sets owner to false" do
+      it "sets admin to false" do
         outcome = described_class.run(valid_params)
-        expect(outcome.result.owner).to be false
+        expect(outcome.result.admin).to be false
       end
 
       it "sends invitation email" do
@@ -58,7 +58,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
     context "with invalid parameters" do
       it "fails when email is blank" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           email: "",
           name: "New User"
         )
@@ -69,7 +69,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
 
       it "fails when email format is invalid" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           email: "invalid-email",
           name: "New User"
         )
@@ -80,7 +80,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
 
       it "fails when name is blank" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           email: "newuser@example.com",
           name: ""
         )
@@ -91,7 +91,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
 
       it "fails when name is too short" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           email: "newuser@example.com",
           name: "A"
         )
@@ -102,7 +102,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
 
       it "fails when name is too long" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           email: "newuser@example.com",
           name: "A" * 101
         )
@@ -113,7 +113,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
     end
 
     context "authorization" do
-      it "fails when current_user is not an owner" do
+      it "fails when current_user is not an admin" do
         outcome = described_class.run(
           current_user: regular_user,
           email: "newuser@example.com",
@@ -121,7 +121,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
         )
 
         expect(outcome).not_to be_valid
-        expect(outcome.errors[:current_user]).to include("must be an owner")
+        expect(outcome.errors[:current_user]).to include("must be an admin")
       end
     end
 
@@ -132,7 +132,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
 
       it "fails when email already exists" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           email: "existing@example.com",
           name: "New User"
         )
@@ -143,7 +143,7 @@ RSpec.describe Invitations::SendInvitation, type: :service do
 
       it "fails when email already exists with different case" do
         outcome = described_class.run(
-          current_user: owner,
+          current_user: admin_user,
           email: "EXISTING@example.com",
           name: "New User"
         )

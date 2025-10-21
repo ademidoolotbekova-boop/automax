@@ -3,10 +3,13 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
+#  admin                  :boolean          default(FALSE), not null
 #  email                  :string           not null
+#  invitation_accepted_at :datetime
+#  invitation_sent_at     :datetime
+#  invitation_token       :string
 #  name                   :string           not null
-#  owner                  :boolean          default(FALSE), not null
-#  password_digest        :string           not null
+#  password_digest        :string
 #  reset_password_digest  :string
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
@@ -15,7 +18,8 @@
 #
 # Indexes
 #
-#  index_users_on_email  (email) UNIQUE
+#  index_users_on_email             (email) UNIQUE
+#  index_users_on_invitation_token  (invitation_token) UNIQUE
 #
 FactoryBot.define do
   factory :user do
@@ -23,10 +27,10 @@ FactoryBot.define do
     sequence(:email) { |n| "user#{n}@example.com" }
     password { "password123" }
     password_confirmation { "password123" }
-    owner { false }
+    admin { false }
 
-    trait :owner do
-      owner { true }
+    trait :admin do
+      admin { true }
     end
 
     trait :invited do
