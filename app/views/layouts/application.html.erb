@@ -5,22 +5,49 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%#
+      DARK MODE FLASH PREVENTION (FOUC)
+
+      This inline <style> + <script> block prevents the flash of unstyled content (FOUC)
+      when switching between light/dark themes. This is the industry-standard approach
+      used by Next.js (next-themes), Remix, and other modern frameworks.
+
+      WHY IT MUST BE HERE:
+      - Script runs BEFORE page renders (blocking)
+      - Inline styles load BEFORE external CSS
+      - Can't use external files (too slow)
+      - Can't use CSS variables (not defined yet)
+      - MUST hardcode color values to match --sidebar variable
+
+      HOW IT WORKS:
+      1. Inline <style> sets background colors based on .dark class
+      2. Script reads theme from localStorage
+      3. Script adds .dark class to <html> if needed
+      4. Browser paints with correct colors immediately
+      5. React/CSS loads and takes over
+
+      Reference: https://github.com/pacocoursey/next-themes
+    %>
+    <style>
+      /* Prevent white flash - colors match --sidebar variable from application.css */
+      html, body {
+        background-color: oklch(0.985 0 0); /* Light mode: --sidebar */
+      }
+      html.dark, html.dark body {
+        background-color: oklch(0.205 0 0); /* Dark mode: --sidebar */
+      }
+    </style>
+
     <script>
-      // Apply theme immediately to prevent flash - runs before CSS loads
+      // Apply theme class immediately (blocking script)
       try {
         const theme = localStorage.getItem('ui-theme') || 'system';
         const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
         if (isDark) {
           document.documentElement.classList.add('dark');
-          // Set background color immediately to prevent white flash
-          document.documentElement.style.backgroundColor = 'oklch(0.04 0 0)'; // --sidebar in dark mode
-        } else {
-          document.documentElement.classList.remove('dark');
-          document.documentElement.style.backgroundColor = 'oklch(1 0 0)'; // --sidebar in light mode
         }
       } catch (e) {}
     </script>
