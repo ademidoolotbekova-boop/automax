@@ -10,8 +10,7 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
-  super_admin: boolean
+  owner: boolean
   created_at: string
   avatar_url?: string | null
 }
@@ -65,12 +64,11 @@ export default function ProfileShow({ auth, user }: ProfileShowProps) {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div>
-                      <div className="text-sm font-medium text-muted-foreground">Role</div>
-                      <Badge variant={user.super_admin ? 'default' : 'secondary'}>
-                        {user.super_admin ? 'Super Admin' : user.role}
-                      </Badge>
-                    </div>
+                    {user.owner && (
+                      <div>
+                        <Badge variant="default">Owner</Badge>
+                      </div>
+                    )}
 
                     <div>
                       <div className="text-sm font-medium text-muted-foreground">Member Since</div>

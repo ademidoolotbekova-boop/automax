@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                     :integer          not null, primary key
+#  email                  :string           not null
+#  name                   :string           not null
+#  owner                  :boolean          default(FALSE), not null
+#  password_digest        :string           not null
+#  reset_password_digest  :string
+#  reset_password_sent_at :datetime
+#  reset_password_token   :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email  (email) UNIQUE
+#
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
@@ -20,41 +39,17 @@ RSpec.describe User, type: :model do
     it { should have_many(:refresh_tokens).dependent(:destroy) }
   end
 
-  describe 'roles' do
-    let(:user) { create(:user, role: 'user') }
-    let(:admin) { create(:user, role: 'admin') }
-    let(:super_admin) { create(:user, role: 'super_admin', super_admin: true) }
+  describe 'owner flag' do
+    let(:user) { create(:user) }
+    let(:owner) { create(:user, :owner) }
 
-    it 'has role enum' do
-      expect(user.role).to eq('user')
-      expect(admin.role).to eq('admin')
-      expect(super_admin.role).to eq('super_admin')
-    end
-
-    it 'allows role assignment' do
-      user.role = 'admin'
-      expect(user.role).to eq('admin')
-    end
-
-    describe '#super_admin?' do
+    describe '#owner?' do
       it 'returns true for super admins' do
-        expect(super_admin.super_admin?).to be true
+        expect(owner.owner?).to be true
       end
 
       it 'returns false for regular users' do
-        expect(user.super_admin?).to be false
-        expect(admin.super_admin?).to be false
-      end
-    end
-
-    describe '#admin_or_super_admin?' do
-      it 'returns true for admins and super admins' do
-        expect(admin.admin_or_super_admin?).to be true
-        expect(super_admin.admin_or_super_admin?).to be true
-      end
-
-      it 'returns false for regular users' do
-        expect(user.admin_or_super_admin?).to be false
+        expect(user.owner?).to be false
       end
     end
   end

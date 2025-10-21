@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                     :integer          not null, primary key
+#  email                  :string           not null
+#  name                   :string           not null
+#  owner                  :boolean          default(FALSE), not null
+#  password_digest        :string           not null
+#  reset_password_digest  :string
+#  reset_password_sent_at :datetime
+#  reset_password_token   :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email  (email) UNIQUE
+#
 class User < ApplicationRecord
   has_secure_password
 
@@ -15,7 +34,6 @@ class User < ApplicationRecord
                     format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
   validates :password, length: { minimum: 8 }, if: :password_digest_changed?
-  validates :role, inclusion: { in: %w[user admin super_admin] }
   validates :avatar, content_type: { in: %w[image/png image/jpg image/jpeg image/gif],
                                      message: "must be a PNG, JPG, or GIF image" },
                      size: { less_than: 5.megabytes, message: "must be less than 5MB" },
@@ -24,12 +42,9 @@ class User < ApplicationRecord
   # Callbacks
   before_save :normalize_email
 
-  # Role constants
-  ROLES = %w[user admin super_admin].freeze
-
   # Ransack configuration - only allow searching on safe attributes
   def self.ransackable_attributes(auth_object = nil)
-    %w[id name email role super_admin created_at updated_at]
+    %w[id name email owner created_at updated_at]
   end
 
   # Ransack associations - empty for now, add as needed
@@ -57,11 +72,6 @@ class User < ApplicationRecord
     self.reset_password_digest = nil
     self.reset_password_sent_at = nil
     save!
-  end
-
-  # Role helper methods
-  def admin_or_super_admin?
-    role == "admin" || role == "super_admin"
   end
 
   private

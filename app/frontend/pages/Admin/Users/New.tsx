@@ -6,7 +6,6 @@ import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,8 +19,7 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
-  super_admin: boolean
+  owner: boolean
 }
 
 interface AdminUserNewProps {
@@ -33,7 +31,6 @@ interface AdminUserNewProps {
     email?: string[]
     password?: string[]
     password_confirmation?: string[]
-    role?: string[]
   }
 }
 
@@ -43,7 +40,6 @@ export default function AdminUserNew({ auth, errors }: AdminUserNewProps) {
     email: '',
     password: '',
     password_confirmation: '',
-    role: 'user',
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -60,7 +56,7 @@ export default function AdminUserNew({ auth, errors }: AdminUserNewProps) {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Super Admin Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -111,22 +107,6 @@ export default function AdminUserNew({ auth, errors }: AdminUserNewProps) {
                         />
                         {errors?.email && (
                           <p className="text-sm text-destructive">{errors.email[0]}</p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="role">Role</Label>
-                        <Select value={data.role} onValueChange={(value) => setData('role', value)}>
-                          <SelectTrigger id="role">
-                            <SelectValue placeholder="Select Role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="user">User</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {errors?.role && (
-                          <p className="text-sm text-destructive">{errors.role[0]}</p>
                         )}
                       </div>
 

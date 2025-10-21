@@ -14,8 +14,7 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
-  super_admin: boolean
+  owner: boolean
 }
 
 interface AdminConsoleProps {
@@ -24,8 +23,7 @@ interface AdminConsoleProps {
   }
   stats: {
     total_users: number
-    super_admins: number
-    admins: number
+    owners: number
     regular_users: number
     active_sessions: number
   }
@@ -41,7 +39,7 @@ export default function AdminConsole({ auth, stats }: AdminConsoleProps) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbPage>Super Admin Panel</BreadcrumbPage>
+                <BreadcrumbPage>Owner Panel</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -59,7 +57,7 @@ export default function AdminConsole({ auth, stats }: AdminConsoleProps) {
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-            <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+            <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-3">
               <Card className="@container/card">
                 <CardHeader>
                   <CardDescription>Total Users</CardDescription>
@@ -76,28 +74,14 @@ export default function AdminConsole({ auth, stats }: AdminConsoleProps) {
 
               <Card className="@container/card">
                 <CardHeader>
-                  <CardDescription>Super Admins</CardDescription>
+                  <CardDescription>Owners</CardDescription>
                   <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    {stats.super_admins}
+                    {stats.owners}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex-col items-start gap-1.5 text-sm">
                   <div className="text-muted-foreground">
                     Full system access
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="@container/card">
-                <CardHeader>
-                  <CardDescription>Admins</CardDescription>
-                  <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    {stats.admins}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-col items-start gap-1.5 text-sm">
-                  <div className="text-muted-foreground">
-                    Admin role users
                   </div>
                 </CardContent>
               </Card>

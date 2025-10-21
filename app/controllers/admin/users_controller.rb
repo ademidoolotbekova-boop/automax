@@ -25,15 +25,6 @@ class Admin::UsersController < Admin::BaseController
     @q = policy_scope(User).ransack(search_params)
     @users = @q.result
 
-    # Filter by role
-    if params[:role].present?
-      if params[:role] == "super_admin"
-        @users = @users.where(super_admin: true)
-      else
-        @users = @users.where(role: params[:role], super_admin: false)
-      end
-    end
-
     @pagy, @users = pagy(@users, items: 20)
 
     render inertia: "Admin/Users/Index", props: {
@@ -41,7 +32,6 @@ class Admin::UsersController < Admin::BaseController
       pagination: pagination_props(@pagy),
       filters: {
         search: params[:search].presence,
-        role: params[:role].presence,
         sort: sort_column,
         direction: sort_direction
       }
@@ -123,8 +113,7 @@ class Admin::UsersController < Admin::BaseController
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
-      super_admin: user.super_admin,
+      owner: user.owner,
       created_at: user.created_at.iso8601
     }
   end

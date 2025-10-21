@@ -16,8 +16,7 @@ interface LoginResponse {
     id: number
     email: string
     name: string
-    role: string
-    super_admin: boolean
+    owner: boolean
   }
 }
 

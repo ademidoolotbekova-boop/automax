@@ -34,6 +34,19 @@ import './application.css'
 const appElement = document.getElementById('app')
 
 if (appElement) {
+  // Check and migrate localStorage tokens if needed
+  // This helps when we rename fields in the user model (e.g., super_admin -> owner)
+  const authVersion = localStorage.getItem('auth_version')
+  const currentVersion = '2.0' // Increment this when user model structure changes
+
+  if (authVersion !== currentVersion) {
+    // Clear old tokens when version mismatch
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.setItem('auth_version', currentVersion)
+    console.log('Auth tokens cleared due to version update')
+  }
+
   // Configure Inertia to include JWT token in all requests
   router.on('before', (event) => {
     const token = localStorage.getItem('auth_token')

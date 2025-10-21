@@ -21,8 +21,7 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
-  super_admin: boolean
+  owner: boolean
   created_at: string
   avatar_url?: string | null
 }

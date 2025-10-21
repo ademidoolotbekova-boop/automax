@@ -1,7 +1,7 @@
 class UserPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.super_admin?
+      if user.owner?
         scope.all
       else
         scope.where(id: user.id)
@@ -10,15 +10,15 @@ class UserPolicy < ApplicationPolicy
   end
 
   def index?
-    user.super_admin?
+    user.owner?
   end
 
   def show?
-    user.super_admin? || record.id == user.id
+    user.owner? || record.id == user.id
   end
 
   def create?
-    user.super_admin?
+    user.owner?
   end
 
   def new?
@@ -26,7 +26,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    user.super_admin? || record.id == user.id
+    user.owner? || record.id == user.id
   end
 
   def edit?
@@ -34,23 +34,15 @@ class UserPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.super_admin? && record.id != user.id
+    user.owner? && record.id != user.id
   end
 
   def permitted_attributes_for_create
-    if user.super_admin?
-      [ :name, :email, :password, :password_confirmation, :role ]
-    else
-      [ :name, :email, :password, :password_confirmation ]
-    end
+    [ :name, :email, :password, :password_confirmation ]
   end
 
   def permitted_attributes_for_update
-    if user.super_admin?
-      [ :name, :email, :password, :password_confirmation, :role ]
-    else
-      [ :name, :email, :password, :password_confirmation ]
-    end
+    [ :name, :email, :password, :password_confirmation ]
   end
 
   def permitted_attributes

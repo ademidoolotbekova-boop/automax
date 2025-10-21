@@ -3,12 +3,14 @@ class Admin::ConsoleController < Admin::BaseController
 
   def index
     authorize :console, :index?
+    total_users = User.count
+    owners = User.where(owner: true).count
+
     render inertia: "Admin/Console", props: {
       stats: {
-        total_users: User.count,
-        super_admins: User.where(super_admin: true).count,
-        admins: User.where(role: "admin").count,
-        regular_users: User.where(role: "user").count,
+        total_users: total_users,
+        owners: owners,
+        regular_users: total_users - owners,
         active_sessions: RefreshToken.active.count
       }
     }

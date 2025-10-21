@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react'
-import { CrownIcon, MailIcon, ShieldCheckIcon, UserRoundIcon, CalendarIcon } from 'lucide-react'
+import { CrownIcon, MailIcon, UserRoundIcon, CalendarIcon } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -20,8 +20,7 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
-  super_admin: boolean
+  owner: boolean
   created_at: string
 }
 
@@ -34,20 +33,12 @@ interface AdminUserShowProps {
 
 export default function AdminUserShow({ auth, user }: AdminUserShowProps) {
   const getRoleInfo = () => {
-    if (user.super_admin) {
+    if (user.owner) {
       return {
-        label: 'Super Admin',
+        label: 'Owner',
         icon: <CrownIcon className="size-4" />,
         variant: 'default' as const,
         color: 'text-amber-600 dark:text-amber-400',
-      }
-    }
-    if (user.role === 'admin') {
-      return {
-        label: 'Admin',
-        icon: <ShieldCheckIcon className="size-4" />,
-        variant: 'secondary' as const,
-        color: 'text-green-600 dark:text-green-400',
       }
     }
     return {
@@ -77,7 +68,7 @@ export default function AdminUserShow({ auth, user }: AdminUserShowProps) {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Super Admin Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>

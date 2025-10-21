@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -9,9 +9,7 @@ import {
   EyeIcon,
   PencilLineIcon,
   SearchIcon,
-  ShieldCheckIcon,
   Trash2Icon,
-  UserRoundIcon,
   XIcon,
 } from 'lucide-react'
 
@@ -21,7 +19,6 @@ import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/ui/pagination'
 import {
@@ -39,8 +36,7 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
-  super_admin: boolean
+  owner: boolean
   created_at: string
 }
 
@@ -56,7 +52,6 @@ interface Pagination {
 
 interface Filters {
   search?: string | null
-  role?: string | null
   sort?: string
   direction?: string
 }
@@ -93,24 +88,9 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
   const handleSearch = (search: string) => {
     router.get('/admin/users', {
       search: search || undefined,
-      role: filters.role || undefined,
       sort: filters.sort,
       direction: filters.direction,
     }, {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['users', 'pagination', 'filters'],
-    })
-  }
-
-  const handleRoleFilter = (role: string) => {
-    const params = { ...filters }
-    if (role === 'all' || !role) {
-      delete params.role
-    } else {
-      params.role = role
-    }
-    router.get('/admin/users', params, {
       preserveState: true,
       preserveScroll: true,
       only: ['users', 'pagination', 'filters'],
@@ -162,25 +142,6 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
       )
     }
     return <ChevronUpIcon className="size-4 opacity-50" />
-  }
-
-  const getRoleInfo = (user: User) => {
-    if (user.super_admin) {
-      return {
-        label: 'Super Admin',
-        icon: <CrownIcon className="size-4 text-amber-600 dark:text-amber-400" />,
-      }
-    }
-    if (user.role === 'admin') {
-      return {
-        label: 'Admin',
-        icon: <ShieldCheckIcon className="size-4 text-green-600 dark:text-green-400" />,
-      }
-    }
-    return {
-      label: 'User',
-      icon: <UserRoundIcon className="size-4 text-chart-1" />,
-    }
   }
 
   const getUserInitials = (name: string): string => {
@@ -278,7 +239,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/console">Super Admin Panel</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin/console">Owner Panel</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -307,44 +268,27 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
                       <div className="border-b">
                         <div className="flex flex-col gap-4 p-6">
                           <span className="text-xl font-semibold">Filter Users</span>
-                          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <div className="w-full space-y-2">
-                              <Label htmlFor="search">Search by Name or Email</Label>
-                              <div className="relative">
-                                <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                  id="search"
-                                  type="text"
-                                  placeholder="Search users..."
-                                  value={searchTerm}
-                                  onChange={(e) => setSearchTerm(e.target.value)}
-                                  className="pl-9 pr-9"
-                                />
-                                {searchTerm && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setSearchTerm('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                  >
-                                    <XIcon className="size-4" />
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="w-full space-y-2">
-                              <Label htmlFor="role-filter">Select Role</Label>
-                              <Select value={filters.role?.toString() || 'all'} onValueChange={handleRoleFilter}>
-                                <SelectTrigger id="role-filter" className="w-full capitalize">
-                                  <SelectValue placeholder="Select Role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="all">All</SelectItem>
-                                  <SelectItem value="user">User</SelectItem>
-                                  <SelectItem value="admin">Admin</SelectItem>
-                                  <SelectItem value="super_admin">Super Admin</SelectItem>
-                                </SelectContent>
-                              </Select>
+                          <div className="w-full space-y-2">
+                            <Label htmlFor="search">Search by Name or Email</Label>
+                            <div className="relative">
+                              <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                              <Input
+                                id="search"
+                                type="text"
+                                placeholder="Search users..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-9 pr-9"
+                              />
+                              {searchTerm && (
+                                <button
+                                  type="button"
+                                  onClick={() => setSearchTerm('')}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                >
+                                  <XIcon className="size-4" />
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -358,15 +302,6 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
                                 >
                                   User
                                   {getSortIcon('name')}
-                                </button>
-                              </TableHead>
-                              <TableHead className="text-muted-foreground">
-                                <button
-                                  onClick={() => handleSort('role')}
-                                  className="flex items-center gap-1 hover:text-foreground"
-                                >
-                                  Role
-                                  {getSortIcon('role')}
                                 </button>
                               </TableHead>
                               <TableHead className="text-muted-foreground">
@@ -393,7 +328,6 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
                           <TableBody>
                             {users.length > 0 ? (
                               users.map((user) => {
-                                const roleInfo = getRoleInfo(user)
                                 const isCurrentUser = user.id === auth.user.id
 
                                 return (
@@ -405,15 +339,14 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
                                           <AvatarFallback className="text-xs">{getUserInitials(user.name)}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">
-                                          <span className="font-medium">{user.name}</span>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium">{user.name}</span>
+                                            {user.owner && (
+                                              <CrownIcon className="size-3.5 text-amber-600 dark:text-amber-400" />
+                                            )}
+                                          </div>
                                           <span className="text-muted-foreground text-xs">{user.email}</span>
                                         </div>
-                                      </div>
-                                    </TableCell>
-                                    <TableCell className="h-14">
-                                      <div className="flex items-center gap-2">
-                                        {roleInfo.icon}
-                                        <span className="capitalize">{roleInfo.label}</span>
                                       </div>
                                     </TableCell>
                                     <TableCell className="h-14">
@@ -458,7 +391,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
                               })
                             ) : (
                               <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
+                                <TableCell colSpan={4} className="h-24 text-center">
                                   No users found.
                                 </TableCell>
                               </TableRow>
