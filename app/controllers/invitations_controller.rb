@@ -31,8 +31,8 @@ class InvitationsController < ApplicationController
       user = outcome.result
 
       # Log the user in
-      jwt_token = Services::Auth::JwtService.encode(user_id: user.id)
-      refresh_token_data = Services::Auth::JwtService.generate_refresh_token(user)
+      jwt_token = Auth::JwtService.encode(user_id: user.id)
+      refresh_token_data = Auth::JwtService.generate_refresh_token(user)
 
       render json: {
         user: {

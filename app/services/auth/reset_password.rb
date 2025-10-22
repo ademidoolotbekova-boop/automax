@@ -1,6 +1,5 @@
-module Services
-  module Auth
-    class ResetPassword < ActiveInteraction::Base
+module Auth
+  class ResetPassword < ActiveInteraction::Base
       string :token
       string :password
       string :password_confirmation
@@ -53,6 +52,5 @@ module Services
           errors.add(:password_confirmation, "doesn't match password")
         end
       end
-    end
   end
 end

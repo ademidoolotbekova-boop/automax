@@ -1,6 +1,5 @@
-module Services
-  module Auth
-    class RequestPasswordReset < ActiveInteraction::Base
+module Auth
+  class RequestPasswordReset < ActiveInteraction::Base
       string :email
 
       validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -16,6 +15,5 @@ module Services
         # Don't reveal if user exists for security
         { user: user }
       end
-    end
   end
 end

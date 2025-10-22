@@ -8,7 +8,7 @@ class Password::ResetController < ApplicationController
 
   # POST /password/forgot
   def forgot
-    outcome = Services::Auth::RequestPasswordReset.run(email: params[:email])
+    outcome = Auth::RequestPasswordReset.run(email: params[:email])
 
     if outcome.valid?
       # In production, would send email here
@@ -25,7 +25,7 @@ class Password::ResetController < ApplicationController
 
   # PUT /password/reset
   def update
-    outcome = Services::Auth::ResetPassword.run(
+    outcome = Auth::ResetPassword.run(
       token: params[:token],
       password: params[:password],
       password_confirmation: params[:password_confirmation]

@@ -13,7 +13,7 @@ module Authenticatable
 
     return unless token
 
-    decoded = Services::Auth::JwtService.decode(token)
+    decoded = Auth::JwtService.decode(token)
     return unless decoded
 
     @current_user = User.find_by(id: decoded["user_id"])

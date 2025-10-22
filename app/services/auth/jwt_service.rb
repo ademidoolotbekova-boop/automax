@@ -1,6 +1,5 @@
-module Services
-  module Auth
-    class JwtService
+module Auth
+  class JwtService
       SECRET_KEY = Rails.application.credentials.secret_key_base || Rails.application.secret_key_base
 
       # Encode payload into JWT token
@@ -59,6 +58,5 @@ module Services
 
         nil
       end
-    end
   end
 end

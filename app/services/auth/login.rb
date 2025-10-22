@@ -1,6 +1,5 @@
-module Services
-  module Auth
-    class Login < ActiveInteraction::Base
+module Auth
+  class Login < ActiveInteraction::Base
       string :email
       string :password
 
@@ -31,6 +30,5 @@ module Services
           errors.add(:base, "Invalid email or password")
         end
       end
-    end
   end
 end

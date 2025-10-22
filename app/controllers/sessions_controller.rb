@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
 
   # POST /session
   def create
-    outcome = Services::Auth::Login.run(
+    outcome = Auth::Login.run(
       email: params[:email],
       password: params[:password]
     )
@@ -38,7 +38,7 @@ class SessionsController < ApplicationController
 
   # POST /session/refresh
   def refresh
-    outcome = Services::Auth::RefreshTokenService.run(
+    outcome = Auth::RefreshTokenService.run(
       refresh_token: params[:refresh_token]
     )
 

@@ -1,6 +1,5 @@
-module Services
-  module Auth
-    class RefreshTokenService < ActiveInteraction::Base
+module Auth
+  class RefreshTokenService < ActiveInteraction::Base
       string :refresh_token
 
       validate :verify_token
@@ -31,6 +30,5 @@ module Services
           errors.add(:base, "Invalid or expired refresh token")
         end
       end
-    end
   end
 end
