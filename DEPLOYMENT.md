@@ -16,7 +16,7 @@
 
 2. **Create your Fly app:**
    ```bash
-   fly apps create $FLY_APP_NAME
+   fly apps create $FLY_APP_NAME --org personal
    ```
 
 3. **Set up required secrets:**
@@ -40,7 +40,7 @@
 ### Deploy
 
 ```bash
-fly deploy --app $FLY_APP_NAME
+fly deploy --app $FLY_APP_NAME --remote-only
 ```
 
 ### Post-Deployment
