@@ -1,7 +1,10 @@
 module AuthenticationHelpers
-  def auth_headers(user)
-    token = Services::Auth::JwtService.encode(user_id: user.id)
-    { 'Authorization' => "Bearer #{token}" }
+  def auth_headers(user, inertia: false)
+    token = Auth::JwtService.encode(user_id: user.id)
+    headers = { 'Authorization' => "Bearer #{token}" }
+    headers['X-Inertia'] = 'true' if inertia
+    headers['X-Inertia-Version'] = '1.0' if inertia
+    headers
   end
 
   def json_response

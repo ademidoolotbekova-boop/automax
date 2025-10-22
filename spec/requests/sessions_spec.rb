@@ -38,7 +38,7 @@ RSpec.describe "Sessions", type: :request do
   end
 
   describe "POST /session/refresh" do
-    let(:refresh_token_data) { Services::Auth::JwtService.generate_refresh_token(user) }
+    let(:refresh_token_data) { Auth::JwtService.generate_refresh_token(user) }
     let(:refresh_token_string) { refresh_token_data[:token] }
 
     context "with valid refresh token" do

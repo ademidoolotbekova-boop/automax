@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe Services::Auth::RefreshTokenService, type: :service do
+RSpec.describe Auth::RefreshTokenService, type: :service do
   let(:user) { create(:user) }
-  let(:refresh_token_data) { Services::Auth::JwtService.generate_refresh_token(user) }
+  let(:refresh_token_data) { Auth::JwtService.generate_refresh_token(user) }
   let(:refresh_token_string) { refresh_token_data[:token] }
 
   describe '#execute' do

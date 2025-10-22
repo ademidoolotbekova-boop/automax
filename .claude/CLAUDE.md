@@ -1,7 +1,8 @@
 # Starter Base Inertia - Project Guidelines
 
-> **This file contains project-specific guidelines for this Inertia.js + React application.**
-> **Universal standards are in `~/.claude/CLAUDE.md` - read that file first!**
+> **For Claude Code instances working on this project.**
+> **Read `~/.claude/CLAUDE.md` first, then this file.**
+> **Purpose: Prevent errors, ensure consistency, point to reference code.**
 
 ---
 
@@ -12,7 +13,9 @@
 - **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui (Shadcn Studio Premium)
 - **Database**: SQLite
-- **Testing**: RSpec (backend), no frontend tests yet
+- **Testing**:
+  - Backend: RSpec + Inertia Rails test helpers
+  - Frontend: Vitest + React Testing Library + Jest DOM
 - **Services**: ActiveInteraction
 - **Pagination**: pagy
 - **Authorization**: Pundit
@@ -24,99 +27,109 @@
 ### Rails Patterns
 
 **Service Objects (ActiveInteraction)**:
-- All business logic in `app/services/` using ActiveInteraction
-- Namespace: `Services::`
-- Always specify class for object filters: `object :user, class: User`
+- **CRITICAL**: Namespace by directory, NOT by `Services::` prefix
+  - ✅ `Auth::JwtService`, `Invitations::SendInvitation`
+  - ❌ `Services::Auth::JwtService`, `Services::Invitations::SendInvitation`
+- Must specify class for object filters: `object :user, class: User`
 - Use `string` for dates (not `date` filter - forms send strings)
-- See `app/services/invitations/` for complete examples
+- Reference: `app/services/invitations/send_invitation.rb`, `app/services/auth/login.rb`
 
 **Authorization (Pundit)**:
 - All resources require policies in `app/policies/`
 - Controllers must call `authorize @resource` before actions
 - Use `policy_scope(Resource)` for index actions
-- See `app/policies/user_policy.rb` for reference
+- Reference: `app/policies/user_policy.rb`
 
 **Active Record**:
 - Integer-backed enums: `enum :status, { pending: 0, active: 1 }`
-- Validate at both model AND database levels
+- **CRITICAL**: Validate at both model AND database levels
 
 ### Authentication & Authorization
 - **JWT-based** (not cookies) - tokens in localStorage for iframe compatibility
-- **Auto-refresh** every 30 days
-- **Authenticatable concern** in ApplicationController provides `current_user`
-- See `app/controllers/sessions_controller.rb` and `app/controllers/concerns/authenticatable.rb`
+- Authenticatable concern in ApplicationController provides `current_user`
+- Reference: `app/controllers/sessions_controller.rb`, `app/controllers/concerns/authenticatable.rb`
 
 ### Inertia.js
 - Controller responses use `render inertia:` for pages
 - Shared props auto-injected: `auth`, `flash`, `errors`
-- JSON responses for API-style endpoints (see `InvitationsController`)
 - Create `_props` helper methods for consistent serialization
+- Reference: `app/controllers/admin/users_controller.rb` (example with _props methods)
 
 ### Frontend Stack
-- **React + TypeScript** with Inertia.js
 - **Forms**: React Hook Form + Zod validation
-- **UI**: Shadcn UI Premium (`@ss-components` > `@ss-themes` > `@ss-blocks` > `@shadcn`)
-- **Navigation**: Inertia router (not browser navigation)
-
-### Shadcn UI
-**Adding components**:
-```bash
-npx shadcn@latest add @ss-components/button --yes --overwrite
-```
+- **UI**: Shadcn UI Premium (priority: `@ss-components` > `@ss-themes` > `@ss-blocks` > `@shadcn`)
+- **CRITICAL**: Use Inertia router, NOT browser navigation (`router.visit()` not `window.location`)
+- Reference: `app/frontend/pages/Profile/Edit.tsx` (form example)
 
 ---
 
-## Reference Examples
+## Reference Examples - Study Before Building Similar Features
 
-**Study these files before building similar features:**
+### Complete CRUD with Authorization + Inertia
+- **User Management**: `app/controllers/admin/users_controller.rb`, `app/policies/user_policy.rb`, `app/frontend/pages/Admin/Users/`
 
-### Complete Feature Examples
+### Service Objects + Email + Public Pages
+- **Invitation System**: `app/services/invitations/`, `app/controllers/invitations_controller.rb`, `app/mailers/user_mailer.rb`, `app/frontend/pages/Invitations/Accept.tsx`
 
-1. **User Management (Admin)**
-   - Controller: `app/controllers/admin/users_controller.rb`
-   - Policy: `app/policies/user_policy.rb`
-   - Services: `app/services/invitations/` (SendInvitation, AcceptInvitation, ResendInvitation)
-   - Pages: `app/frontend/pages/Admin/Users/` (Index, Show, New, Edit)
-   - Shows complete CRUD with authorization, service objects, and Inertia
+### File Uploads + Forms
+- **Profile Management**: `app/controllers/profiles_controller.rb`, `app/frontend/pages/Profile/Edit.tsx`
 
-2. **Invitation System**
-   - Controller: `app/controllers/invitations_controller.rb` (public controller)
-   - Services: `app/services/invitations/` (complete invitation flow)
-   - Mailer: `app/mailers/user_mailer.rb` (invitation_email method)
-   - Page: `app/frontend/pages/Invitations/Accept.tsx` (public page with form)
-   - Shows API-style JSON responses, email sending, public pages
-
-3. **Profile Management**
-   - Controller: `app/controllers/profiles_controller.rb`
-   - Pages: `app/frontend/pages/Profile/` (Show, Edit)
-   - Shows file uploads with Active Storage, form handling
-
-4. **Dashboard**
-   - Controller: `app/controllers/dashboard_controller.rb`
-   - Page: `app/frontend/pages/Dashboard.tsx`
-   - Shows simple authenticated page
-
-### Component Examples
-
-1. **Sidebar Navigation**
-   - Component: `app/frontend/components/app-sidebar.tsx`
-   - Shows shadcn sidebar with navigation, user menu
-
-2. **Delete Confirmation Dialog**
-   - Component: `app/frontend/components/delete-confirmation-dialog.tsx`
-   - Shows reusable dialog component
-
-3. **UI Components**
-   - All in: `app/frontend/components/ui/`
-   - Study existing components before adding new ones
+### Components
+- **Sidebar**: `app/frontend/components/app-sidebar.tsx`
+- **Dialog**: `app/frontend/components/delete-confirmation-dialog.tsx`
+- **All UI**: `app/frontend/components/ui/`
 
 ---
 
 ## Testing
 
-- Models, services, policies, request specs
-- See `spec/` directory for complete examples
-- Study `spec/requests/admin/users_spec.rb` and `spec/requests/invitations_spec.rb`
+### Backend (RSpec + Inertia Rails)
+
+**CRITICAL - Common Errors:**
+- ❌ Props use **string keys**, NOT symbols: `inertia.props["stats"]` not `inertia.props[:stats]`
+- ❌ Must add `inertia: true` flag to describe block for Inertia matchers to work
+- ❌ Must use `auth_headers(user, inertia: true)` for Inertia requests
+- ✅ Inertia matchers: `render_component()`, `include_props()`, `have_exact_props()`
+
+**Reference Files:**
+- Pagination/search: `spec/requests/admin/users_spec.rb:38-94`
+- Error handling: `spec/requests/admin/users_spec.rb:141-172,209-239`
+- Flash messages: `spec/requests/admin/users_spec.rb:210-221`
+- Props testing: `spec/requests/invitations_spec.rb:24-45`
+- Basic example: `spec/requests/admin/console_spec.rb`
+- Auth helper: `spec/support/authentication_helpers.rb`
+
+**Commands:**
+```bash
+bundle exec rspec                       # All tests
+bundle exec rspec spec/path/file.rb:42  # Single test at line 42
+```
+
+### Frontend (Vitest + React Testing Library)
+
+**CRITICAL - Common Errors:**
+- ❌ Pages using SidebarProvider will fail without custom render
+- ✅ Import `render` from `@/test/utils` for pages (includes SidebarProvider)
+- ✅ Import `render` from `@testing-library/react` for simple components
+- ✅ window.matchMedia already mocked in `app/frontend/test/setup.ts`
+- ❌ Must mock Inertia router: `vi.mock('@inertiajs/react')`
+
+**Reference Files:**
+- Form + validation: `app/frontend/pages/Admin/Users/New.test.tsx`
+- Dialog + events: `app/frontend/components/delete-confirmation-dialog.test.tsx`
+- Basic component: `app/frontend/components/ui/button.test.tsx`
+- Basic page: `app/frontend/pages/Dashboard.test.tsx`
+- Test utils: `app/frontend/test/utils.tsx`
+
+**During Implementation (watch mode gives instant feedback):**
+```bash
+npm test              # Keep running, auto-reruns on changes
+```
+
+**Before Marking Feature Complete:**
+```bash
+npm test -- --run && bundle exec rspec    # Both must pass
+```
 
 ---
 
@@ -135,15 +148,20 @@ app/
 ├── frontend/
 │   ├── components/
 │   │   ├── ui/              # shadcn components
+│   │   │   └── button.test.tsx
 │   │   ├── app-sidebar.tsx
 │   │   └── delete-confirmation-dialog.tsx
 │   ├── pages/
 │   │   ├── Admin/
 │   │   │   └── Users/
 │   │   ├── Dashboard.tsx
+│   │   ├── Dashboard.test.tsx
 │   │   ├── Invitations/
 │   │   ├── Login.tsx
 │   │   └── Profile/
+│   ├── test/
+│   │   ├── setup.ts         # Test setup (matchMedia mock)
+│   │   └── utils.tsx        # Custom render with providers
 │   └── lib/
 │       ├── auth-service.ts
 │       └── utils.ts
@@ -154,30 +172,51 @@ app/
 ├── policies/
 │   └── user_policy.rb
 └── services/
+    ├── auth/
+    │   ├── jwt_service.rb
+    │   └── login.rb
     └── invitations/
         ├── send_invitation.rb
         ├── accept_invitation.rb
         └── resend_invitation.rb
+
+spec/
+├── models/
+├── services/
+│   ├── auth/
+│   └── invitations/
+├── policies/
+├── requests/
+│   ├── admin/
+│   │   ├── console_spec.rb  # Inertia test example
+│   │   └── users_spec.rb
+│   ├── sessions_spec.rb
+│   └── invitations_spec.rb
+└── support/
+    └── authentication_helpers.rb
+
+vitest.config.ts             # Frontend test config
 ```
 
 ---
 
-## Common Patterns Checklist
+## Pre-Implementation Checklist
 
-Before implementing a new feature, check:
+**CRITICAL - Before implementing any feature:**
 
-- [ ] **Authentication**: Does it need JWT authentication?
-- [ ] **Authorization**: Create Pundit policy and write tests
-- [ ] **Service Objects**: Use ActiveInteraction for business logic
-- [ ] **Props**: Create consistent `_props` helper methods
-- [ ] **TypeScript**: Define interfaces for all props
-- [ ] **Forms**: Use React Hook Form + Zod validation
-- [ ] **UI**: Use shadcn premium components
-- [ ] **Styling**: Follow existing patterns
-- [ ] **Navigation**: Use Inertia router, not browser navigation
-- [ ] **Errors**: Handle both service errors and form validation
-- [ ] **Tests**: Write complete backend specs (models, services, policies, requests)
+- [ ] Study existing similar features (see Reference Examples above)
+- [ ] **Service Objects**: Namespace by directory (`Auth::`, `Invitations::`), NOT `Services::`
+- [ ] **Navigation**: Use `router.visit()`, NOT `window.location` or `<a href>`
+- [ ] **Authorization**: Create Pundit policy and tests
+- [ ] **Props**: Create `_props` helper methods in controllers
+- [ ] **TypeScript**: Define interfaces for all Inertia props
+- [ ] **Tests**: Follow TDD - write tests BEFORE implementation
+  * Backend: Model, Service, Policy, Request specs
+  * Frontend: Component and Page tests (run `npm test` in watch mode)
+  * Inertia endpoints: Add `inertia: true` flag, use string keys for props
+  * Pages with Sidebar: Use `render` from `@/test/utils`
+  * **Before marking complete**: `npm test -- --run && bundle exec rspec` (both must pass)
 
 ---
 
-*This file contains patterns specific to this Inertia.js + React project. Universal Rails standards are in `~/.claude/CLAUDE.md`.*
+**Remember**: Always check reference files before implementing. Consistency > reinvention.

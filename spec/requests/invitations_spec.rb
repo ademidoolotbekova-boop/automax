@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Invitations", type: :request do
+RSpec.describe "Invitations", type: :request, inertia: true do
   let(:invited_user) { create(:user, :invited) }
   let(:token) { invited_user.invitation_token }
 
@@ -12,12 +12,27 @@ RSpec.describe "Invitations", type: :request do
         expect(response).to have_http_status(:ok)
       end
 
-      it "passes user data to the page" do
-        get accept_invitation_path(token: token)
+      context "with Inertia request" do
+        it "renders Invitations/Accept component" do
+          get accept_invitation_path(token: token), headers: { 'X-Inertia' => 'true', 'X-Inertia-Version' => '1.0' }
 
-        # Inertia renders data in the data-page attribute
-        expect(response.body).to include("Invitations/Accept")
-        expect(response.body).to include(invited_user.email)
+          expect(inertia).to render_component("Invitations/Accept")
+        end
+
+        it "includes token in props" do
+          get accept_invitation_path(token: token), headers: { 'X-Inertia' => 'true', 'X-Inertia-Version' => '1.0' }
+
+          expect(inertia.props["token"]).to eq(token)
+        end
+
+        it "includes user data in props" do
+          get accept_invitation_path(token: token), headers: { 'X-Inertia' => 'true', 'X-Inertia-Version' => '1.0' }
+
+          expect(inertia).to include_props("user" => {
+            "name" => invited_user.name,
+            "email" => invited_user.email
+          })
+        end
       end
     end
 

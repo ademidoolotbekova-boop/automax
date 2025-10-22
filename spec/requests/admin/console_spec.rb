@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Admin::Console", type: :request do
+RSpec.describe "Admin::Console", type: :request, inertia: true do
   let(:regular_user) { create(:user) }
   let(:admin_user) { create(:user, :admin) }
 
@@ -32,10 +32,27 @@ RSpec.describe "Admin::Console", type: :request do
         expect(response).to have_http_status(:success)
       end
 
-      it "includes stats in response" do
-        get admin_console_path, headers: auth_headers(admin_user)
-        expect(response).to have_http_status(:success)
-        # Stats should be in Inertia props, but we can verify response is successful
+      it "renders Admin/Console component" do
+        get admin_console_path, headers: auth_headers(admin_user, inertia: true)
+        expect(inertia).to render_component("Admin/Console")
+      end
+
+      it "includes stats in props" do
+        get admin_console_path, headers: auth_headers(admin_user, inertia: true)
+
+        expect(inertia).to include_props("stats" => {
+          "total_users" => 5,  # 3 regular + 1 admin from before block + 1 admin_user
+          "admins" => 2,
+          "regular_users" => 3,
+          "active_sessions" => 0
+        })
+      end
+
+      it "provides access to individual props" do
+        get admin_console_path, headers: auth_headers(admin_user, inertia: true)
+
+        expect(inertia.props["stats"]["total_users"]).to eq(5)
+        expect(inertia.props["stats"]["admins"]).to eq(2)
       end
     end
   end

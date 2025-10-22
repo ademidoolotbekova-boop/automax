@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Admin::AuditLogs", type: :request do
+RSpec.describe "Admin::AuditLogs", type: :request, inertia: true do
   let(:regular_user) { create(:user) }
   let(:admin_user) { create(:user, :admin) }
 
@@ -33,24 +33,24 @@ RSpec.describe "Admin::AuditLogs", type: :request do
         expect(response).to have_http_status(:success)
       end
 
-      it "returns audit logs data" do
-        get admin_audit_logs_path, headers: auth_headers(admin_user)
-        expect(response).to have_http_status(:success)
-      end
+      context "with Inertia requests" do
+        it "renders Admin/AuditLogs/Index component" do
+          get admin_audit_logs_path, headers: auth_headers(admin_user, inertia: true)
+          expect(inertia).to render_component("Admin/AuditLogs/Index")
+        end
 
-      it "filters by search term" do
-        get admin_audit_logs_path, params: { search: "Updated" }, headers: auth_headers(admin_user)
-        expect(response).to have_http_status(:success)
-      end
+        it "includes audit logs in props" do
+          get admin_audit_logs_path, headers: auth_headers(admin_user, inertia: true)
 
-      it "filters by action" do
-        get admin_audit_logs_path, params: { action_filter: "update" }, headers: auth_headers(admin_user)
-        expect(response).to have_http_status(:success)
-      end
+          expect(inertia.props["audits"]).to be_an(Array)
+          expect(inertia.props["audits"]).not_to be_empty
+        end
 
-      it "supports sorting" do
-        get admin_audit_logs_path, params: { sort_column: "created_at", sort_direction: "asc" }, headers: auth_headers(admin_user)
-        expect(response).to have_http_status(:success)
+        it "includes filters in props" do
+          get admin_audit_logs_path, params: { search: "Updated" }, headers: auth_headers(admin_user, inertia: true)
+
+          expect(inertia.props["filters"]["search"]).to eq("Updated")
+        end
       end
     end
   end

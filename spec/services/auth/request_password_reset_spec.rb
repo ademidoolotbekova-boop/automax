@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Services::Auth::RequestPasswordReset, type: :service do
+RSpec.describe Auth::RequestPasswordReset, type: :service do
   let(:user) { create(:user, email: 'user@example.com') }
 
   describe '#execute' do

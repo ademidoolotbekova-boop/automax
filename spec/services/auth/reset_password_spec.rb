@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Services::Auth::ResetPassword, type: :service do
+RSpec.describe Auth::ResetPassword, type: :service do
   let(:user) { create(:user) }
   let(:token) { user.generate_password_reset_token }
 

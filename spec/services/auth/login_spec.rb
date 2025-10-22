@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Services::Auth::Login, type: :service do
+RSpec.describe Auth::Login, type: :service do
   let(:user) { create(:user, email: 'user@example.com', password: 'password123') }
 
   describe '#execute' do

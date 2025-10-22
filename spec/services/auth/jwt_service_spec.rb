@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Services::Auth::JwtService do
+RSpec.describe Auth::JwtService do
   let(:user) { create(:user) }
   let(:payload) { { user_id: user.id } }
 
