@@ -37,6 +37,9 @@ gem "pagy", "~> 9.3"
 # Search
 gem "ransack"
 
+# Audit trail for ActiveRecord models
+gem "audited", "~> 5.6"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
@@ -78,8 +81,6 @@ group :development, :test do
   gem "faker", "~> 3.5"
   # Annotates Rails/ActiveRecord Models based on the database schema
   gem "annotaterb", "~> 4.14"
-  # Audit trail for ActiveRecord models
-  gem "audited", "~> 5.6"
 
   # Load environment variables from .env file
   gem "dotenv-rails", "~> 3.1"
@@ -101,3 +102,9 @@ group :test do
   # For testing controller layouts and templates
   gem "rails-controller-testing"
 end
+
+gem "dockerfile-rails", ">= 1.7", group: :development
+
+gem "litestream", "~> 0.14.0"
+
+gem "aws-sdk-s3", "~> 1.201", require: false
