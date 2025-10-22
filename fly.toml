@@ -1,9 +1,19 @@
-# fly.toml app configuration file generated for starter-base-delicate-water-3543 on 2025-10-21T21:06:42-07:00
+# fly.toml app configuration file
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
+# DEPLOYMENT:
+# Set your app name and deploy with:
+#   fly apps create your-app-name
+#   fly deploy --app your-app-name
+#
+# Or use an environment variable:
+#   export FLY_APP_NAME=your-app-name
+#   fly deploy --app $FLY_APP_NAME
+#
+# Leave this empty - pass app name via --app flag
 
-app = 'starter-base-delicate-water-3543'
+app = ''
 primary_region = 'dfw'
 console_command = '/rails/bin/rails console'
 
