@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { router } from '@inertiajs/react'
-import pickBy from 'lodash/pickBy'
-import debounce from 'lodash/debounce'
+import { useState, useEffect } from 'react'
 
 import {
   ChevronDownIcon,
@@ -22,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button'
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/ui/pagination'
 import { PageHeader } from '@/components/page-header'
+import { DateRangePicker } from '@/components/date-range-picker'
 
 import { cn } from '@/lib/utils'
 
@@ -49,6 +48,8 @@ interface User {
 interface Filters {
   search?: string
   action_filter?: string
+  created_from?: string | null
+  created_to?: string | null
   sort_column?: string
   sort_direction?: string
 }
@@ -72,123 +73,7 @@ interface AdminAuditLogsIndexProps {
   filters: Filters
 }
 
-// Filter component with proper debouncing pattern
-const AuditLogsFilter = ({ filters, audits }: { filters: Filters; audits: AuditLog[] }) => {
-  const [search, setSearch] = useState(filters.search || '')
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  const [isSearching, setIsSearching] = useState(false)
-
-  const debouncedSearch = useCallback(
-    debounce((searchValue: string) => {
-      router.get(
-        '/admin/audit_logs',
-        pickBy({
-          search: searchValue,
-          action_filter: filters.action_filter,
-          sort_column: filters.sort_column,
-          sort_direction: filters.sort_direction,
-        }),
-        {
-          preserveState: true,
-          preserveScroll: true,
-          replace: true,
-          onSuccess: () => {
-            setIsSearching(false)
-          },
-        }
-      )
-    }, 300),
-    [filters.action_filter, filters.sort_column, filters.sort_direction]
-  )
-
-  // Restore focus after Inertia re-render
-  useEffect(() => {
-    if (isSearching && searchInputRef.current && document.activeElement !== searchInputRef.current) {
-      searchInputRef.current.focus()
-    }
-  }, [audits, isSearching])
-
-  useEffect(() => {
-    return () => debouncedSearch.cancel()
-  }, [debouncedSearch])
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setSearch(value)
-    setIsSearching(true)
-    debouncedSearch(value)
-  }
-
-  const clearSearch = () => {
-    setSearch('')
-    setIsSearching(true)
-    debouncedSearch('')
-  }
-
-  const handleActionFilter = (value: string) => {
-    router.get(
-      '/admin/audit_logs',
-      pickBy({
-        search,
-        action_filter: value === 'all' ? '' : value,
-        sort_column: filters.sort_column,
-        sort_direction: filters.sort_direction,
-      }),
-      {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true,
-      }
-    )
-  }
-
-  return (
-    <div className="flex flex-col gap-4 p-6">
-      <span className="text-xl font-semibold">Filter Logs</span>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <div className="w-full space-y-2">
-          <Label htmlFor="search">Search by User Name or Email</Label>
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              ref={searchInputRef}
-              id="search"
-              type="text"
-              placeholder="Search audit logs..."
-              value={search}
-              onChange={handleSearchChange}
-              className={cn("pl-9", search && "pr-9")}
-            />
-            {search && (
-              <button
-                type="button"
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <XIcon className="size-4" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="w-full space-y-2">
-          <Label htmlFor="action-filter">Select Action</Label>
-          <Select value={filters.action_filter || 'all'} onValueChange={handleActionFilter}>
-            <SelectTrigger id="action-filter" className="w-full capitalize">
-              <SelectValue placeholder="Select Action" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="create">Created</SelectItem>
-              <SelectItem value="update">Updated</SelectItem>
-              <SelectItem value="destroy">Deleted</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </div>
-  )
-}
+// Removed separate filter component - filters are now inline in the main component for consistency with Admin Users
 
 export default function AdminAuditLogsIndex({
   auth,
@@ -196,37 +81,100 @@ export default function AdminAuditLogsIndex({
   pagination,
   filters,
 }: AdminAuditLogsIndexProps) {
+  const [searchTerm, setSearchTerm] = useState(filters.search || '')
+
+  // Debounced search with 300ms delay
+  // IMPORTANT: Uses 'only' parameter to prevent shared props from updating,
+  // which maintains input focus during typing. See Admin Users for pattern.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Normalize comparison: treat null/undefined as empty string
+      const currentFilter = filters.search || ''
+      if (searchTerm !== currentFilter) {
+        handleSearch(searchTerm)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  const handleSearch = (search: string) => {
+    router.get('/admin/audit_logs', {
+      search: search || undefined,
+      action_filter: filters.action_filter,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
+      sort_column: filters.sort_column,
+      sort_direction: filters.sort_direction,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['audits', 'pagination', 'filters'],
+    })
+  }
+
+  const handleActionFilter = (value: string) => {
+    router.get('/admin/audit_logs', {
+      search: searchTerm || undefined,
+      action_filter: value === 'all' ? undefined : value,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
+      sort_column: filters.sort_column,
+      sort_direction: filters.sort_direction,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['audits', 'pagination', 'filters'],
+    })
+  }
+
+  const handleDateRangeChange = (range?: { from?: string; to?: string }) => {
+    router.get('/admin/audit_logs', {
+      search: searchTerm || undefined,
+      action_filter: filters.action_filter,
+      created_from: range?.from || undefined,
+      created_to: range?.to || undefined,
+      sort_column: filters.sort_column,
+      sort_direction: filters.sort_direction,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['audits', 'pagination', 'filters'],
+    })
+  }
 
   const handleSort = (column: string) => {
     const isCurrentColumn = filters.sort_column === column
     const newDirection = isCurrentColumn && filters.sort_direction === 'asc' ? 'desc' : 'asc'
 
-    router.get(
-      '/admin/audit_logs',
-      {
-        ...filters,
-        sort_column: column,
-        sort_direction: newDirection,
-      },
-      {
-        preserveState: true,
-        preserveScroll: true,
-      }
-    )
+    router.get('/admin/audit_logs', {
+      search: searchTerm || undefined,
+      action_filter: filters.action_filter,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
+      sort_column: column,
+      sort_direction: newDirection,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['audits', 'pagination', 'filters'],
+    })
   }
 
   const handlePageChange = (page: number) => {
-    router.get(
-      '/admin/audit_logs',
-      {
-        ...filters,
-        page,
-      },
-      {
-        preserveState: true,
-        preserveScroll: true,
-      }
-    )
+    router.get('/admin/audit_logs', {
+      search: searchTerm || undefined,
+      action_filter: filters.action_filter,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
+      sort_column: filters.sort_column,
+      sort_direction: filters.sort_direction,
+      page,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['audits', 'pagination', 'filters'],
+    })
   }
 
   const getSortIcon = (column: string) => {
@@ -381,7 +329,61 @@ export default function AdminAuditLogsIndex({
                   <CardContent className="p-0">
                     <div className="w-full">
                       <div className="border-b">
-                        <AuditLogsFilter filters={filters} audits={audits} />
+                        <div className="flex flex-col gap-4 p-6">
+                          <span className="text-xl font-semibold">Filter Logs</span>
+                          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0">
+                            <div className="w-full space-y-2 min-w-0">
+                              <Label htmlFor="search">Search by User Name or Email</Label>
+                              <div className="relative">
+                                <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                  id="search"
+                                  type="text"
+                                  placeholder="Search audit logs..."
+                                  value={searchTerm}
+                                  onChange={(e) => setSearchTerm(e.target.value)}
+                                  className="pl-9 pr-9"
+                                />
+                                {searchTerm && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                  >
+                                    <XIcon className="size-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="w-full space-y-2 min-w-0">
+                              <Label htmlFor="action-filter">Select Action</Label>
+                              <Select value={filters.action_filter || 'all'} onValueChange={handleActionFilter}>
+                                <SelectTrigger id="action-filter" className="w-full capitalize">
+                                  <SelectValue placeholder="Select Action" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">All</SelectItem>
+                                  <SelectItem value="create">Created</SelectItem>
+                                  <SelectItem value="update">Updated</SelectItem>
+                                  <SelectItem value="destroy">Deleted</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="w-full space-y-2 min-w-0">
+                              <Label htmlFor="date-range">Filter by Creation Date</Label>
+                              <DateRangePicker
+                                value={{
+                                  from: filters.created_from || undefined,
+                                  to: filters.created_to || undefined,
+                                }}
+                                onChange={handleDateRangeChange}
+                                placeholder="Pick a date range"
+                              />
+                            </div>
+                          </div>
+                        </div>
                         <Table>
                           <TableHeader>
                             <TableRow className="h-14 border-t">

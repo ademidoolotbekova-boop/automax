@@ -18,12 +18,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/ui/pagination'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog'
 import { PageHeader } from '@/components/page-header'
+import { DateRangePicker } from '@/components/date-range-picker'
 
 interface User {
   id: number
@@ -50,6 +52,9 @@ interface Filters {
   search?: string | null
   sort?: string
   direction?: string
+  status_filter?: string | null
+  created_from?: string | null
+  created_to?: string | null
 }
 
 interface AdminUsersIndexProps {
@@ -86,6 +91,39 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
       search: search || undefined,
       sort: filters.sort,
       direction: filters.direction,
+      status_filter: filters.status_filter,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['users', 'pagination', 'filters'],
+    })
+  }
+
+  const handleStatusFilter = (value: string) => {
+    router.get('/admin/users', {
+      search: filters.search,
+      sort: filters.sort,
+      direction: filters.direction,
+      status_filter: value === 'all' ? undefined : value,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['users', 'pagination', 'filters'],
+    })
+  }
+
+  const handleDateRangeChange = (range?: { from?: string; to?: string }) => {
+    router.get('/admin/users', {
+      search: filters.search,
+      sort: filters.sort,
+      direction: filters.direction,
+      status_filter: filters.status_filter,
+      created_from: range?.from,
+      created_to: range?.to,
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -96,9 +134,12 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
   const handleSort = (column: string) => {
     const direction = filters.sort === column && filters.direction === 'asc' ? 'desc' : 'asc'
     router.get('/admin/users', {
-      ...filters,
+      search: filters.search,
       sort: column,
       direction,
+      status_filter: filters.status_filter,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -108,7 +149,12 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
 
   const handlePageChange = (page: number) => {
     router.get('/admin/users', {
-      ...filters,
+      search: filters.search,
+      sort: filters.sort,
+      direction: filters.direction,
+      status_filter: filters.status_filter,
+      created_from: filters.created_from,
+      created_to: filters.created_to,
       page,
     }, {
       preserveState: true,
@@ -260,27 +306,56 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
                       <div className="border-b">
                         <div className="flex flex-col gap-4 p-6">
                           <span className="text-xl font-semibold">Filter Users</span>
-                          <div className="w-full space-y-2">
-                            <Label htmlFor="search">Search by Name or Email</Label>
-                            <div className="relative">
-                              <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                              <Input
-                                id="search"
-                                type="text"
-                                placeholder="Search users..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 pr-9"
+                          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0">
+                            <div className="w-full space-y-2 min-w-0">
+                              <Label htmlFor="search">Search by Name or Email</Label>
+                              <div className="relative">
+                                <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                  id="search"
+                                  type="text"
+                                  placeholder="Search users..."
+                                  value={searchTerm}
+                                  onChange={(e) => setSearchTerm(e.target.value)}
+                                  className="pl-9 pr-9"
+                                />
+                                {searchTerm && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                  >
+                                    <XIcon className="size-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="w-full space-y-2 min-w-0">
+                              <Label htmlFor="status-filter">Select Status</Label>
+                              <Select value={filters.status_filter || 'all'} onValueChange={handleStatusFilter}>
+                                <SelectTrigger id="status-filter" className="w-full capitalize">
+                                  <SelectValue placeholder="Select Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">All</SelectItem>
+                                  <SelectItem value="active">Active</SelectItem>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="inactive">Inactive</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="w-full space-y-2 min-w-0">
+                              <Label htmlFor="date-range">Filter by Creation Date</Label>
+                              <DateRangePicker
+                                value={{
+                                  from: filters.created_from || undefined,
+                                  to: filters.created_to || undefined,
+                                }}
+                                onChange={handleDateRangeChange}
+                                placeholder="Pick a date range"
                               />
-                              {searchTerm && (
-                                <button
-                                  type="button"
-                                  onClick={() => setSearchTerm('')}
-                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                >
-                                  <XIcon className="size-4" />
-                                </button>
-                              )}
                             </div>
                           </div>
                         </div>

@@ -5,21 +5,37 @@ class Admin::AuditLogsController < Admin::BaseController
   # GET /admin/audit_logs
   def index
     authorize Audited::Audit
+
+    # Start with base scope
     audits = policy_scope(Audited::Audit).where(auditable_type: "User").includes(:user)
 
-    # Search by user name or email
+    # Search by user name or email (complex OR logic - better with plain SQL)
     if params[:search].present?
-      search_term = "%#{params[:search]}%"
-      user_ids = User.where("name LIKE ? OR email LIKE ?", search_term, search_term).pluck(:id)
-      audits = audits.where("auditable_id IN (?) OR user_id IN (?)", user_ids, user_ids)
+      user_ids = User.ransack(name_or_email_cont: params[:search]).result.pluck(:id)
+      if user_ids.any?
+        audits = audits.where("auditable_id IN (?) OR user_id IN (?)", user_ids, user_ids)
+      else
+        audits = audits.none # Return empty if no users match
+      end
     end
 
-    # Filter by action type
+    # Filter by action type (simple where clause)
     if params[:action_filter].present?
       audits = audits.where(action: params[:action_filter])
     end
 
-    # Sort
+    # Use Ransack for date range and sorting
+    search_params = {}
+
+    if params[:created_from].present?
+      search_params[:created_at_gteq] = Date.parse(params[:created_from]).beginning_of_day
+    end
+
+    if params[:created_to].present?
+      search_params[:created_at_lteq] = Date.parse(params[:created_to]).end_of_day
+    end
+
+    # Sorting - default to created_at desc
     sort_column = params[:sort_column].presence || "created_at"
     sort_direction = params[:sort_direction].presence || "desc"
 
@@ -27,7 +43,10 @@ class Admin::AuditLogsController < Admin::BaseController
     sort_column = "created_at" unless allowed_columns.include?(sort_column)
     sort_direction = "desc" unless %w[asc desc].include?(sort_direction)
 
-    audits = audits.order("#{sort_column} #{sort_direction}")
+    search_params[:s] = "#{sort_column} #{sort_direction}"
+
+    @q = audits.ransack(search_params)
+    audits = @q.result
 
     @pagy, @audits = pagy(audits, items: 20)
 
@@ -37,6 +56,8 @@ class Admin::AuditLogsController < Admin::BaseController
       filters: {
         search: params[:search],
         action_filter: params[:action_filter],
+        created_from: params[:created_from],
+        created_to: params[:created_to],
         sort_column: sort_column,
         sort_direction: sort_direction
       }

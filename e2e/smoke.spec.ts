@@ -193,6 +193,106 @@ test.describe('Smoke Tests: Critical User Flows', () => {
     })
   })
 
+  test.describe('Filtering & Search', () => {
+    authTest('admin can search users by name or email', async ({ adminPage }) => {
+      // Create a unique user to search for
+      await adminPage.goto('/admin/users/new')
+      const timestamp = Date.now()
+      await adminPage.fill('#name', `Searchable User ${timestamp}`)
+      await adminPage.fill('#email', `search${timestamp}@example.com`)
+      await adminPage.click('button[type="submit"]')
+
+      // Wait for redirect to users list
+      await expect(adminPage).toHaveURL('/admin/users', { timeout: 10000 })
+
+      // Pattern: Search with debounce
+      await adminPage.fill('#search', `search${timestamp}@example.com`)
+
+      // Wait for debounce to apply (300ms)
+      await adminPage.waitForTimeout(500)
+
+      // Pattern: Verify URL params updated
+      await expect(adminPage).toHaveURL(/search=search/, { timeout: 2000 })
+
+      // Should see only the searched user
+      await expect(adminPage.locator(`text=search${timestamp}@example.com`).first()).toBeVisible()
+    })
+
+    authTest('admin can filter users by status', async ({ adminPage }) => {
+      await adminPage.goto('/admin/users')
+
+      // Wait for page to load
+      await adminPage.waitForTimeout(1000)
+
+      // Pattern: Select dropdown interaction using ID selector
+      await adminPage.click('[id="status-filter"]')
+      await adminPage.waitForTimeout(300)
+
+      // Pattern: Select option by text using role selector
+      await adminPage.click('[role="option"]:has-text("Active")')
+
+      // Wait for filter to apply
+      await adminPage.waitForTimeout(500)
+
+      // Pattern: URL params updated
+      await expect(adminPage).toHaveURL(/status_filter=active/)
+    })
+
+    authTest('filters persist in URL parameters', async ({ adminPage }) => {
+      await adminPage.goto('/admin/users')
+
+      // Apply multiple filters
+      await adminPage.fill('#search', 'admin')
+      await adminPage.waitForTimeout(500)
+
+      await adminPage.click('[id="status-filter"]')
+      await adminPage.waitForTimeout(300)
+      await adminPage.click('[role="option"]:has-text("Active")')
+      await adminPage.waitForTimeout(500)
+
+      // Verify URL has both params
+      await expect(adminPage).toHaveURL(/search=admin/)
+      await expect(adminPage).toHaveURL(/status_filter=active/)
+
+      // Pattern: Reload page and verify filters persist
+      await adminPage.reload()
+
+      // Filters should still be applied after reload
+      const searchInput = await adminPage.locator('#search').inputValue()
+      expect(searchInput).toBe('admin')
+
+      // URL params should still be there
+      await expect(adminPage).toHaveURL(/search=admin/)
+      await expect(adminPage).toHaveURL(/status_filter=active/)
+    })
+
+    authTest('admin can filter users by date range', async ({ adminPage }) => {
+      await adminPage.goto('/admin/users')
+
+      // Wait for page to load
+      await adminPage.waitForTimeout(1000)
+
+      // Pattern: Click date range picker button
+      await adminPage.click('[id="date-range"]')
+
+      // Wait for calendar popup to appear
+      await adminPage.waitForSelector('[role="dialog"]', { timeout: 2000 })
+
+      // Pattern: Click first selectable date (not disabled)
+      await adminPage.locator('[role="gridcell"]:not([disabled])').first().click()
+
+      // Pattern: Click another date to create a range
+      await adminPage.locator('[role="gridcell"]:not([disabled])').nth(5).click()
+
+      // Wait for filter to apply
+      await adminPage.waitForTimeout(500)
+
+      // Pattern: URL params updated
+      await expect(adminPage).toHaveURL(/created_from=/)
+      await expect(adminPage).toHaveURL(/created_to=/)
+    })
+  })
+
   test.describe('User Profile', () => {
     authTest('user can view their profile', async ({ authenticatedPage }) => {
       await authenticatedPage.goto('/profile')

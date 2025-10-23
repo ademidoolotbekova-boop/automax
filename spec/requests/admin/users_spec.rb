@@ -84,6 +84,97 @@ RSpec.describe "Admin::Users", type: :request, inertia: true do
           expect(inertia.props["filters"]["sort"]).to eq("created_at")
           expect(inertia.props["filters"]["direction"]).to eq("desc")
         end
+
+        it "filters users by status: active" do
+          active_user = create(:user, email: "active@example.com", password: "password123")
+          pending_user = create(:user, email: "pending@example.com", password_digest: nil, invitation_sent_at: Time.current)
+
+          get admin_users_path, params: { status_filter: "active" }, headers: auth_headers(admin_user, inertia: true)
+
+          user_ids = inertia.props["users"].map { |u| u["id"] }
+          expect(user_ids).to include(active_user.id, admin_user.id)
+          expect(user_ids).not_to include(pending_user.id)
+        end
+
+        it "filters users by status: pending" do
+          active_user = create(:user, email: "active@example.com", password: "password123")
+          pending_user = create(:user, email: "pending@example.com", password_digest: nil, invitation_sent_at: Time.current)
+
+          get admin_users_path, params: { status_filter: "pending" }, headers: auth_headers(admin_user, inertia: true)
+
+          user_ids = inertia.props["users"].map { |u| u["id"] }
+          expect(user_ids).to include(pending_user.id)
+          expect(user_ids).not_to include(active_user.id, admin_user.id)
+        end
+
+        it "filters users by status: inactive" do
+          active_user = create(:user, email: "active@example.com", password: "password123")
+          pending_user = create(:user, email: "pending@example.com", password_digest: nil, invitation_sent_at: Time.current)
+          inactive_user = create(:user, email: "inactive@example.com", password_digest: nil, invitation_sent_at: nil)
+
+          get admin_users_path, params: { status_filter: "inactive" }, headers: auth_headers(admin_user, inertia: true)
+
+          user_ids = inertia.props["users"].map { |u| u["id"] }
+          expect(user_ids).to include(inactive_user.id)
+          expect(user_ids).not_to include(active_user.id, pending_user.id, admin_user.id)
+        end
+
+        it "includes status_filter in props" do
+          get admin_users_path, params: { status_filter: "active" }, headers: auth_headers(admin_user, inertia: true)
+
+          expect(inertia.props["filters"]["status_filter"]).to eq("active")
+        end
+
+        it "returns all users when status_filter is 'all' or not provided" do
+          active_user = create(:user, email: "active@example.com", password: "password123")
+          pending_user = create(:user, email: "pending@example.com", password_digest: nil, invitation_sent_at: Time.current)
+
+          get admin_users_path, params: { status_filter: "all" }, headers: auth_headers(admin_user, inertia: true)
+
+          user_ids = inertia.props["users"].map { |u| u["id"] }
+          expect(user_ids).to include(active_user.id, pending_user.id, admin_user.id)
+        end
+
+        it "filters users by created_from date" do
+          old_user = create(:user, email: "old@example.com", created_at: 10.days.ago)
+          new_user = create(:user, email: "new@example.com", created_at: 2.days.ago)
+
+          get admin_users_path, params: { created_from: 5.days.ago.to_date.to_s }, headers: auth_headers(admin_user, inertia: true)
+
+          user_ids = inertia.props["users"].map { |u| u["id"] }
+          expect(user_ids).to include(new_user.id, admin_user.id)
+          expect(user_ids).not_to include(old_user.id)
+        end
+
+        it "filters users by created_to date" do
+          old_user = create(:user, email: "old@example.com", created_at: 10.days.ago)
+          new_user = create(:user, email: "new@example.com", created_at: 2.days.ago)
+
+          get admin_users_path, params: { created_to: 5.days.ago.to_date.to_s }, headers: auth_headers(admin_user, inertia: true)
+
+          user_ids = inertia.props["users"].map { |u| u["id"] }
+          expect(user_ids).to include(old_user.id)
+          expect(user_ids).not_to include(new_user.id)
+        end
+
+        it "filters users by date range (created_from and created_to)" do
+          very_old_user = create(:user, email: "veryold@example.com", created_at: 20.days.ago)
+          old_user = create(:user, email: "old@example.com", created_at: 10.days.ago)
+          new_user = create(:user, email: "new@example.com", created_at: 2.days.ago)
+
+          get admin_users_path, params: { created_from: 15.days.ago.to_date.to_s, created_to: 5.days.ago.to_date.to_s }, headers: auth_headers(admin_user, inertia: true)
+
+          user_ids = inertia.props["users"].map { |u| u["id"] }
+          expect(user_ids).to include(old_user.id)
+          expect(user_ids).not_to include(very_old_user.id, new_user.id)
+        end
+
+        it "includes date filter params in props" do
+          get admin_users_path, params: { created_from: "2025-01-01", created_to: "2025-01-31" }, headers: auth_headers(admin_user, inertia: true)
+
+          expect(inertia.props["filters"]["created_from"]).to eq("2025-01-01")
+          expect(inertia.props["filters"]["created_to"]).to eq("2025-01-31")
+        end
       end
     end
   end

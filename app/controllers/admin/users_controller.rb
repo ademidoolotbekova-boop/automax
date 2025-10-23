@@ -7,22 +7,42 @@ class Admin::UsersController < Admin::BaseController
   def index
     authorize User
 
-    # Build search query with Ransack
-    search_params = params[:q] || {}
+    # Start with base scope
+    @users = policy_scope(User)
 
-    # Add search term if provided
-    if params[:search].present?
-      search_params = search_params.merge(
-        name_or_email_cont: params[:search]
-      )
+    # Apply status filter (simple where clause)
+    if params[:status_filter].present? && params[:status_filter] != "all"
+      case params[:status_filter]
+      when "active"
+        @users = @users.where.not(password_digest: nil)
+      when "pending"
+        @users = @users.where.not(invitation_sent_at: nil).where(invitation_accepted_at: nil)
+      when "inactive"
+        @users = @users.where(password_digest: nil, invitation_sent_at: nil)
+      end
     end
 
-    # Add sorting - default to created_at desc
+    # Use Ransack for search, date range, and sorting
+    search_params = {}
+
+    if params[:search].present?
+      search_params[:name_or_email_cont] = params[:search]
+    end
+
+    if params[:created_from].present?
+      search_params[:created_at_gteq] = Date.parse(params[:created_from]).beginning_of_day
+    end
+
+    if params[:created_to].present?
+      search_params[:created_at_lteq] = Date.parse(params[:created_to]).end_of_day
+    end
+
+    # Sorting - default to created_at desc
     sort_column = params[:sort] || "created_at"
     sort_direction = params[:direction] || "desc"
-    search_params = search_params.merge(s: "#{sort_column} #{sort_direction}")
+    search_params[:s] = "#{sort_column} #{sort_direction}"
 
-    @q = policy_scope(User).ransack(search_params)
+    @q = @users.ransack(search_params)
     @users = @q.result
 
     @pagy, @users = pagy(@users, items: 20)
@@ -33,7 +53,10 @@ class Admin::UsersController < Admin::BaseController
       filters: {
         search: params[:search].presence,
         sort: sort_column,
-        direction: sort_direction
+        direction: sort_direction,
+        status_filter: params[:status_filter].presence,
+        created_from: params[:created_from].presence,
+        created_to: params[:created_to].presence
       }
     }
   end
