@@ -263,14 +263,14 @@ Reference: `app/frontend/pages/Admin/Users/New.test.tsx`, `app/frontend/componen
 - Check component file to verify exact data-testid value
 - Use page.locator('[data-testid]').all() to see all available testids
 
-**Example** (see `e2e/users-crud.spec.ts:15-35` for full pattern):
+**Example** (see `e2e/smoke.spec.ts:15-35` for full pattern):
 ```tsx
 // ✅ Component: <Button data-testid="create-task-button">...</Button>
 // ✅ Test: await page.getByTestId('create-task-button').click()
 // ✅ Toast: await expect(page.getByText(/successfully created/i)).toBeVisible()
 ```
 
-Reference: `e2e/health-check.spec.ts`, `e2e/users-crud.spec.ts`, `e2e/fixtures/auth.ts`
+Reference: `e2e/health-check.spec.ts`, `e2e/smoke.spec.ts`, `e2e/fixtures/auth.ts`
 </antipattern>
 
 ---
@@ -392,7 +392,7 @@ Adapt premium components, don't build from scratch.
 - `app/frontend/components/ui/button.test.tsx` - Simple component
 - `app/frontend/test/utils.tsx` - Custom render with providers
 - `e2e/health-check.spec.ts` - Health check patterns (minimal system verification)
-- `e2e/users-crud.spec.ts` - Feature E2E patterns (comprehensive workflows)
+- `e2e/smoke.spec.ts` - Feature E2E patterns (comprehensive workflows)
 </reference_files>
 
 ---
