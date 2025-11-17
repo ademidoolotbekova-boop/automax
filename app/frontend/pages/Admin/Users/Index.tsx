@@ -2,8 +2,6 @@ import { router } from '@inertiajs/react'
 import { useState, useEffect } from 'react'
 import {
   ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   ChevronUpIcon,
   CrownIcon,
   EyeIcon,
@@ -20,7 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/ui/pagination'
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog'
@@ -93,6 +91,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
       status_filter: filters.status_filter,
       created_from: filters.created_from,
       created_to: filters.created_to,
+      page: 1,  // Reset to page 1 when searching
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -108,6 +107,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
       status_filter: value === 'all' ? undefined : value,
       created_from: filters.created_from,
       created_to: filters.created_to,
+      page: 1,  // Reset to page 1 when filtering
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -123,6 +123,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
       status_filter: filters.status_filter,
       created_from: range?.from,
       created_to: range?.to,
+      page: 1,  // Reset to page 1 when changing date range
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -139,6 +140,7 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
       status_filter: filters.status_filter,
       created_from: filters.created_from,
       created_to: filters.created_to,
+      page: 1,  // Reset to page 1 when sorting
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -146,20 +148,19 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
     })
   }
 
-  const handlePageChange = (page: number) => {
-    router.get('/admin/users', {
-      search: filters.search,
-      sort: filters.sort,
-      direction: filters.direction,
-      status_filter: filters.status_filter,
-      created_from: filters.created_from,
-      created_to: filters.created_to,
-      page,
-    }, {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['users', 'pagination', 'filters'],
-    })
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams()
+
+    // Use filters from props (server state)
+    if (filters.search) params.set('search', filters.search)
+    if (filters.sort) params.set('sort', filters.sort)
+    if (filters.direction) params.set('direction', filters.direction)
+    if (filters.status_filter) params.set('status_filter', filters.status_filter)
+    if (filters.created_from) params.set('created_from', filters.created_from)
+    if (filters.created_to) params.set('created_to', filters.created_to)
+    params.set('page', page.toString())
+
+    return `/admin/users?${params.toString()}`
   }
 
   const handleDeleteClick = (user: User) => {
@@ -220,16 +221,14 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <Button
-              className="disabled:pointer-events-none disabled:opacity-50"
-              variant="ghost"
-              onClick={() => handlePageChange(pagination.page - 1)}
-              disabled={!pagination.prev}
-              aria-label="Go to previous page"
-            >
-              <ChevronLeftIcon size={16} aria-hidden="true" />
-              Previous
-            </Button>
+            {pagination.prev ? (
+              <PaginationPrevious href={buildPageUrl(pagination.page - 1)} />
+            ) : (
+              <PaginationPrevious
+                className="pointer-events-none opacity-50"
+                aria-disabled="true"
+              />
+            )}
           </PaginationItem>
 
           {startPage > 1 && (
@@ -243,14 +242,13 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
 
             return (
               <PaginationItem key={page}>
-                <Button
-                  size="icon"
-                  className={`${!isActive && 'bg-primary/10 text-primary hover:bg-primary/20'}`}
-                  onClick={() => handlePageChange(page)}
-                  aria-current={isActive ? 'page' : undefined}
+                <PaginationLink
+                  href={buildPageUrl(page)}
+                  isActive={isActive}
+                  className={isActive ? 'bg-primary/10 text-primary hover:bg-primary/20' : ''}
                 >
                   {page}
-                </Button>
+                </PaginationLink>
               </PaginationItem>
             )
           })}
@@ -262,16 +260,14 @@ export default function AdminUsersIndex({ auth, users, pagination, filters }: Ad
           )}
 
           <PaginationItem>
-            <Button
-              className="disabled:pointer-events-none disabled:opacity-50"
-              variant="ghost"
-              onClick={() => handlePageChange(pagination.page + 1)}
-              disabled={!pagination.next}
-              aria-label="Go to next page"
-            >
-              Next
-              <ChevronRightIcon size={16} aria-hidden="true" />
-            </Button>
+            {pagination.next ? (
+              <PaginationNext href={buildPageUrl(pagination.page + 1)} />
+            ) : (
+              <PaginationNext
+                className="pointer-events-none opacity-50"
+                aria-disabled="true"
+              />
+            )}
           </PaginationItem>
         </PaginationContent>
       </Pagination>

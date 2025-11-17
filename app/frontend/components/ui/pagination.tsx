@@ -4,6 +4,7 @@ import {
   ChevronRightIcon,
   MoreHorizontalIcon,
 } from "lucide-react"
+import { Link } from "@inertiajs/react"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -39,29 +40,56 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 
 type PaginationLinkProps = {
   isActive?: boolean
-} & Pick<React.ComponentProps<typeof Button>, "size"> &
-  React.ComponentProps<"a">
+  href?: string
+  onClick?: React.MouseEventHandler<HTMLButtonElement>
+  disabled?: boolean
+  children?: React.ReactNode
+  className?: string
+} & Pick<React.ComponentProps<typeof Button>, "size">
 
 function PaginationLink({
   className,
   isActive,
   size = "icon",
-  ...props
+  href,
+  onClick,
+  disabled,
+  children,
 }: PaginationLinkProps) {
+  const linkClassName = cn(
+    buttonVariants({
+      variant: isActive ? "outline" : "ghost",
+      size,
+    }),
+    className
+  )
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        aria-current={isActive ? "page" : undefined}
+        data-slot="pagination-link"
+        data-active={isActive}
+        className={linkClassName}
+      >
+        {children}
+      </Link>
+    )
+  }
+
   return (
-    <a
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "outline" : "ghost",
-          size,
-        }),
-        className
-      )}
-      {...props}
-    />
+      className={linkClassName}
+    >
+      {children}
+    </button>
   )
 }
 

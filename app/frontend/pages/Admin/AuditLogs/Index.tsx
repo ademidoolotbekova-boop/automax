@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react'
 
 import {
   ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   ChevronUpIcon,
   FileTextIcon,
   SearchIcon,
@@ -17,8 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/ui/pagination'
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 import { DateRangePicker } from '@/components/date-range-picker'
 
 import { cn } from '@/lib/utils'
@@ -104,6 +101,7 @@ export default function AdminAuditLogsIndex({
       created_to: filters.created_to,
       sort_column: filters.sort_column,
       sort_direction: filters.sort_direction,
+      page: 1,  // Reset to page 1 when searching
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -119,6 +117,7 @@ export default function AdminAuditLogsIndex({
       created_to: filters.created_to,
       sort_column: filters.sort_column,
       sort_direction: filters.sort_direction,
+      page: 1,  // Reset to page 1 when filtering
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -134,6 +133,7 @@ export default function AdminAuditLogsIndex({
       created_to: range?.to || undefined,
       sort_column: filters.sort_column,
       sort_direction: filters.sort_direction,
+      page: 1,  // Reset to page 1 when changing date range
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -152,6 +152,7 @@ export default function AdminAuditLogsIndex({
       created_to: filters.created_to,
       sort_column: column,
       sort_direction: newDirection,
+      page: 1,  // Reset to page 1 when sorting
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -159,20 +160,19 @@ export default function AdminAuditLogsIndex({
     })
   }
 
-  const handlePageChange = (page: number) => {
-    router.get('/admin/audit_logs', {
-      search: searchTerm || undefined,
-      action_filter: filters.action_filter,
-      created_from: filters.created_from,
-      created_to: filters.created_to,
-      sort_column: filters.sort_column,
-      sort_direction: filters.sort_direction,
-      page,
-    }, {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['audits', 'pagination', 'filters'],
-    })
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams()
+
+    // Use filters from props (server state), not local state
+    if (filters.search) params.set('search', filters.search)
+    if (filters.action_filter) params.set('action_filter', filters.action_filter)
+    if (filters.created_from) params.set('created_from', filters.created_from)
+    if (filters.created_to) params.set('created_to', filters.created_to)
+    if (filters.sort_column) params.set('sort_column', filters.sort_column)
+    if (filters.sort_direction) params.set('sort_direction', filters.sort_direction)
+    params.set('page', page.toString())
+
+    return `/admin/audit_logs?${params.toString()}`
   }
 
   const getSortIcon = (column: string) => {
@@ -249,16 +249,14 @@ export default function AdminAuditLogsIndex({
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <Button
-              className="disabled:pointer-events-none disabled:opacity-50"
-              variant="ghost"
-              onClick={() => handlePageChange(pagination.page - 1)}
-              disabled={!pagination.prev}
-              aria-label="Go to previous page"
-            >
-              <ChevronLeftIcon size={16} aria-hidden="true" />
-              Previous
-            </Button>
+            {pagination.prev ? (
+              <PaginationPrevious href={buildPageUrl(pagination.page - 1)} />
+            ) : (
+              <PaginationPrevious
+                className="pointer-events-none opacity-50"
+                aria-disabled="true"
+              />
+            )}
           </PaginationItem>
 
           {startPage > 1 && (
@@ -272,14 +270,13 @@ export default function AdminAuditLogsIndex({
 
             return (
               <PaginationItem key={page}>
-                <Button
-                  size="icon"
-                  className={`${!isActive && 'bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 dark:focus-visible:ring-primary/40'}`}
-                  onClick={() => handlePageChange(page)}
-                  aria-current={isActive ? 'page' : undefined}
+                <PaginationLink
+                  href={buildPageUrl(page)}
+                  isActive={isActive}
+                  className={isActive ? 'bg-primary/10 text-primary hover:bg-primary/20' : ''}
                 >
                   {page}
-                </Button>
+                </PaginationLink>
               </PaginationItem>
             )
           })}
@@ -291,16 +288,14 @@ export default function AdminAuditLogsIndex({
           )}
 
           <PaginationItem>
-            <Button
-              className="disabled:pointer-events-none disabled:opacity-50"
-              variant="ghost"
-              onClick={() => handlePageChange(pagination.page + 1)}
-              disabled={!pagination.next}
-              aria-label="Go to next page"
-            >
-              Next
-              <ChevronRightIcon size={16} aria-hidden="true" />
-            </Button>
+            {pagination.next ? (
+              <PaginationNext href={buildPageUrl(pagination.page + 1)} />
+            ) : (
+              <PaginationNext
+                className="pointer-events-none opacity-50"
+                aria-disabled="true"
+              />
+            )}
           </PaginationItem>
         </PaginationContent>
       </Pagination>
