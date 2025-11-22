@@ -4,9 +4,10 @@ import {
   Sparkles,
   Zap,
   Shield,
-  Layout,
+  Database,
   Code2,
-  ArrowRight
+  ArrowRight,
+  UserCog
 } from 'lucide-react'
 
 export default function Landing() {
@@ -54,7 +55,7 @@ export default function Landing() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/login">
               <Button size="lg" className="group bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/50 transition-all">
-                Get Started Free
+                Get Started
                 <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
@@ -70,10 +71,10 @@ export default function Landing() {
             </p>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {[
-                { name: 'Rails 8', icon: Code2 },
-                { name: 'React + Inertia', icon: Layout },
-                { name: 'Authentication', icon: Shield },
-                { name: 'Admin Panel', icon: Sparkles },
+                { name: 'Frontend + Backend', icon: Code2 },
+                { name: 'Built-in Database', icon: Database },
+                { name: 'Authentication and Permissions', icon: Shield },
+                { name: 'Admin Panel and User Management', icon: UserCog },
               ].map((tech) => (
                 <div
                   key={tech.name}
@@ -143,7 +144,17 @@ export default function Landing() {
       {/* Footer */}
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Built with Rails, React, Inertia, and Tailwind CSS</p>
+          <p>
+            Built using{' '}
+            <a
+              href="https://cayu.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Cayu AI
+            </a>
+          </p>
         </div>
       </footer>
 
