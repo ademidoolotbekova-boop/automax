@@ -6,7 +6,7 @@
 
 ## Core Modules
 
-### 1. Multi-Country Support
+### 1. Multi-Country & Multi-Language Support
 
 **Country Selection System**
 
@@ -15,6 +15,15 @@
 - All content adapts based on selected country
 - Country preference stored in user session
 - Country-specific traffic rules and regulations
+
+**Language Support**
+
+- Two languages available: English and Russian (Русский)
+- Language selector in navigation header
+- Complete interface translation for both languages
+- All UI elements, navigation, buttons, and messages localized
+- Language preference stored in user session
+- Seamless language switching without page reload
 
 ### 2. Learning Platform
 
@@ -268,6 +277,14 @@ The AI assistant can answer questions about:
 4. AI assistant responses reflect new country context
 5. Dashboard updates with appropriate flag and country name
 
+### Language Switching
+
+1. User clicks language selector in top navigation
+2. Selects preferred language (English or Русский)
+3. Entire interface immediately updates to selected language
+4. All menus, buttons, labels, and messages display in chosen language
+5. Language preference is remembered for future sessions
+
 ## Data Access Rules
 
 ### Regular User Access
@@ -276,6 +293,7 @@ The AI assistant can answer questions about:
 - Access all learning content (lessons, AI assistant)
 - View own progress and statistics
 - Select country preference
+- Select language preference (English/Russian)
 - Cannot access admin features
 - Cannot view other users' data
 
@@ -305,6 +323,13 @@ The AI assistant can answer questions about:
 - Three countries supported
 - Session-based storage
 - All pages adapt to selected country
+
+✅ **Language Support**
+- Language selector in navigation (English/Русский)
+- Complete Russian translation infrastructure
+- Session-based language preference
+- Seamless switching without page reload
+- Comprehensive translations for all UI elements
 
 ✅ **Lesson Library**
 - 7 categories with 21 total lessons
