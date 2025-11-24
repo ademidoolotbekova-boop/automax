@@ -44,6 +44,25 @@ Rails.application.routes.draw do
   # Dashboard (authenticated users)
   get :dashboard, to: "dashboard#index"
 
+  # Country selection
+  namespace :country do
+    post :select
+  end
+
+  # AI Assistant
+  get "ai-assistant", to: "ai_assistant#index"
+  post "ai-assistant/chat", to: "ai_assistant#chat"
+
+  # Lessons
+  get :lessons, to: "lessons#index"
+  get "lessons/:id", to: "lessons#show", as: :lesson
+
+  # Practice Tests (placeholder for future)
+  get "practice-tests", to: "practice_tests#index"
+
+  # Progress
+  get :progress, to: "progress#index"
+
   # Root path - smart redirect based on authentication
   root to: "home#index"
 

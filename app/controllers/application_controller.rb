@@ -25,7 +25,8 @@ class ApplicationController < ActionController::Base
         success: flash[:success],
         error: flash[:error],
         notice: flash[:notice]
-      }
+      },
+      selectedCountry: session[:selected_country] || 'kg'
     }
   end
 

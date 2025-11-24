@@ -1,7 +1,11 @@
 import * as React from "react"
 import {
   LayoutDashboardIcon,
-  AppWindowIcon,
+  Car,
+  MessageSquare,
+  BookOpen,
+  TrendingUp,
+  ClipboardList,
 } from "lucide-react"
 import { Link } from "@inertiajs/react"
 
@@ -38,6 +42,26 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       url: "/dashboard",
       icon: LayoutDashboardIcon,
     },
+    {
+      title: "AI Assistant",
+      url: "/ai-assistant",
+      icon: MessageSquare,
+    },
+    {
+      title: "Browse Lessons",
+      url: "/lessons",
+      icon: BookOpen,
+    },
+    {
+      title: "Practice Tests",
+      url: "/practice-tests",
+      icon: ClipboardList,
+    },
+    {
+      title: "My Progress",
+      url: "/progress",
+      icon: TrendingUp,
+    },
   ]
 
   return (
@@ -47,11 +71,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent data-[active=true]:bg-transparent">
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-black text-white dark:bg-white dark:text-black">
-                  <AppWindowIcon className="size-4" />
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
+                  <Car className="size-4 text-white" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">My App</span>
+                  <span className="truncate font-semibold">AutoMax AI</span>
                 </div>
               </Link>
             </SidebarMenuButton>

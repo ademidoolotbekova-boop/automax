@@ -23,6 +23,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbS
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import ProfileDropdown from '@/components/shadcn-studio/blocks/dropdown-profile'
+import { CountrySelector } from '@/components/country-selector'
 
 interface FlashMessages {
   success?: string
@@ -39,6 +40,7 @@ interface BreadcrumbItem {
 interface PageProps {
   flash?: FlashMessages
   breadcrumbs?: BreadcrumbItem[]
+  selectedCountry?: string
   [key: string]: any
 }
 
@@ -51,6 +53,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const flash = props.flash
   const auth = (props as any).auth
   const breadcrumbs = props.breadcrumbs || [{ label: 'Dashboard', href: '/dashboard' }]
+  const selectedCountry = props.selectedCountry || 'kg'
 
   // Show toast notifications when flash messages change
   useEffect(() => {
@@ -138,7 +141,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                     </BreadcrumbList>
                   </Breadcrumb>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-3">
+                  <CountrySelector selectedCountry={selectedCountry} />
                   <ProfileDropdown
                     user={auth.user}
                     trigger={
