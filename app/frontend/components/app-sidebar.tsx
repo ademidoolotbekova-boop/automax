@@ -7,7 +7,8 @@ import {
   TrendingUp,
   ClipboardList,
 } from "lucide-react"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
+import { useTranslation, type LanguageCode } from "@/lib/i18n"
 
 import { NavMain } from "@/components/nav-main"
 import {
@@ -31,6 +32,10 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
+  const { props: pageProps } = usePage<any>()
+  const selectedLanguage = (pageProps.selectedLanguage || 'en') as LanguageCode
+  const { t } = useTranslation(selectedLanguage)
+
   const navMain: Array<{
     title: string
     url: string
@@ -38,27 +43,27 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     activePattern?: string
   }> = [
     {
-      title: "Dashboard",
+      title: t.nav.dashboard,
       url: "/dashboard",
       icon: LayoutDashboardIcon,
     },
     {
-      title: "AI Assistant",
+      title: t.nav.aiAssistant,
       url: "/ai-assistant",
       icon: MessageSquare,
     },
     {
-      title: "Browse Lessons",
+      title: t.nav.browseLessons,
       url: "/lessons",
       icon: BookOpen,
     },
     {
-      title: "Practice Tests",
+      title: t.nav.practiceTests,
       url: "/practice-tests",
       icon: ClipboardList,
     },
     {
-      title: "My Progress",
+      title: t.nav.myProgress,
       url: "/progress",
       icon: TrendingUp,
     },

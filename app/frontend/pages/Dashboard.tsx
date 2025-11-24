@@ -13,6 +13,7 @@ import {
   Image as ImageIcon,
   CheckCircle2
 } from 'lucide-react'
+import { useTranslation, type LanguageCode } from '@/lib/i18n'
 
 interface DashboardProps {
   auth: {
@@ -24,9 +25,11 @@ interface DashboardProps {
     }
   }
   selectedCountry?: string
+  selectedLanguage?: LanguageCode
 }
 
-export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardProps) {
+export default function Dashboard({ auth, selectedCountry = 'kg', selectedLanguage = 'en' }: DashboardProps) {
+  const { t } = useTranslation(selectedLanguage)
   const countryFlag = { kg: '🇰🇬', ru: '🇷🇺', us: '🇺🇸' }[selectedCountry]
   const countryName = { kg: 'Kyrgyzstan', ru: 'Russia', us: 'USA' }[selectedCountry]
 
@@ -58,11 +61,11 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-3xl">{countryFlag}</span>
                   <h1 className="text-3xl font-bold tracking-tight">
-                    Welcome back, {auth.user.name}!
+                    {t.dashboard.welcomeBack}, {auth.user.name}!
                   </h1>
                 </div>
                 <p className="text-muted-foreground">
-                  Continue your driving education in {countryName}
+                  {t.dashboard.continueEducation} {countryName}
                 </p>
               </div>
             </div>
@@ -73,13 +76,13 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Lessons Completed</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.dashboard.lessonsCompleted}</CardTitle>
                   <CheckCircle2 className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.lessonsCompleted} / {stats.totalLessons}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {progressPercentage}% complete
+                    {progressPercentage}% {t.common.complete}
                   </p>
                   <Progress value={progressPercentage} className="mt-2" />
                 </CardContent>
@@ -87,39 +90,39 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Time Spent Learning</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.dashboard.timeSpentLearning}</CardTitle>
                   <Clock className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.timeSpent} min</div>
+                  <div className="text-2xl font-bold">{stats.timeSpent} {t.lessons.duration}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    This week
+                    {t.dashboard.thisWeek}
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Current Streak</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.dashboard.currentStreak}</CardTitle>
                   <Zap className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.currentStreak} days</div>
+                  <div className="text-2xl font-bold">{stats.currentStreak} {t.common.days}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Keep learning daily!
+                    {t.dashboard.keepLearningDaily}
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Next Milestone</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.dashboard.nextMilestone}</CardTitle>
                   <Target className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">5 lessons</div>
+                  <div className="text-2xl font-bold">5 {t.common.lessons}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Until badge unlock
+                    {t.dashboard.untilBadgeUnlock}
                   </p>
                 </CardContent>
               </Card>
@@ -130,8 +133,8 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
           <div className="px-4 lg:px-6">
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Jump right back into learning</CardDescription>
+                <CardTitle>{t.dashboard.quickActions}</CardTitle>
+                <CardDescription>{t.dashboard.jumpBackInto}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-3">
@@ -144,7 +147,7 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
                         <ArrowRight className="ml-auto size-4" />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold">Continue Learning</p>
+                        <p className="font-semibold">{t.dashboard.continueLearning}</p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {stats.lastLesson}
                         </p>
@@ -161,9 +164,9 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
                         <ArrowRight className="ml-auto size-4" />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold">Ask AI Assistant</p>
+                        <p className="font-semibold">{t.dashboard.askAIAssistant}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Get instant answers to your questions
+                          {t.dashboard.getInstantAnswers}
                         </p>
                       </div>
                     </Button>
@@ -178,9 +181,9 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
                         <ArrowRight className="ml-auto size-4" />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold">Upload Image</p>
+                        <p className="font-semibold">{t.dashboard.uploadImage}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Analyze road signs and situations
+                          {t.dashboard.analyzeRoadSigns}
                         </p>
                       </div>
                     </Button>
@@ -194,7 +197,7 @@ export default function Dashboard({ auth, selectedCountry = 'kg' }: DashboardPro
           <div className="px-4 lg:px-6">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
+                <CardTitle>{t.dashboard.recentActivity}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
