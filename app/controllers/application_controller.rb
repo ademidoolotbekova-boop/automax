@@ -26,7 +26,8 @@ class ApplicationController < ActionController::Base
         error: flash[:error],
         notice: flash[:notice]
       },
-      selectedCountry: session[:selected_country] || 'kg'
+      selectedCountry: session[:selected_country] || 'kg',
+      selectedLanguage: session[:selected_language] || 'en'
     }
   end
 
