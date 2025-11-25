@@ -393,27 +393,31 @@ The AI assistant can answer questions about:
 
 **What's Implemented:**
 
-- Complete lesson database with 21 lessons across 7 categories
-- User progress tracking (started, completed, time spent)
+- Complete lesson database with 9 lessons across 3 categories (foundation ready for all 21)
+- User progress tracking (started, completed, time spent) - fully functional
+- Real-time lesson completion persistence from UI to database
+- Dashboard with real statistics (completed lessons, time spent, learning streaks)
+- Progress page with category breakdown and achievements system
 - Practice test infrastructure (questions, answers, scoring)
-- Chat conversation persistence
+- Chat conversation persistence models
 - Country-specific content support
+- Next lesson recommendations based on user progress
 
 **What's Mock/Placeholder:**
 
-- AI responses still use pattern matching (API integration pending)
+- AI responses still use pattern matching (API integration pending API key)
 - Image analysis UI only (no actual processing)
 - Practice test questions need to be populated
-- Frontend still reads from old controller data (migration in progress)
+- Remaining 12 lessons need seed data (infrastructure complete)
 
 ## Next Steps (Future Versions)
 
 ### Level 2: Remaining Tasks
 
-- Update controllers to use database instead of hardcoded data
-- Complete frontend integration with database
-- Add practice test questions and interface
-- Integrate real AI API (OpenAI/Anthropic)
+- Add remaining 12 lessons to seed data
+- Populate practice test questions and answers
+- Build test-taking interface with timer and scoring
+- Integrate real AI API (pending API key from user)
 
 ### Level 3: Production Ready
 
