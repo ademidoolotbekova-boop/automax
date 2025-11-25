@@ -63,8 +63,11 @@ Rails.application.routes.draw do
   get "lessons/:id", to: "lessons#show", as: :lesson
   post "lessons/:id/complete", to: "lessons#complete", as: :complete_lesson
 
-  # Practice Tests (placeholder for future)
+  # Practice Tests
   get "practice-tests", to: "practice_tests#index"
+  get "practice-tests/:id", to: "practice_tests#show", as: :practice_test
+  post "practice-tests/:id/submit", to: "practice_tests#submit", as: :submit_practice_test
+  get "practice-tests/:id/result", to: "practice_tests#result", as: :result_practice_test
 
   # Progress
   get :progress, to: "progress#index"
