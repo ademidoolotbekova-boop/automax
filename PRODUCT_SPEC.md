@@ -187,20 +187,23 @@ The system automatically tracks user performance by topic:
 - Last practice date tracking with decay factor
 - Strong topics (70%+ competency) vs Weak topics (<50%)
 
-**Features (Infrastructure Ready):**
+**Features (Implemented):**
 
-- Test attempt history with scores
-- Correct/incorrect answer tracking per topic
-- Adaptive difficulty recommendations
-- Score tracking and analytics
-- Timed tests simulating real exams
+- Test question database with 10 sample questions
+- Multiple test types with varying difficulty levels
+- Test attempt tracking with automatic scoring
+- Answer explanations for correct and incorrect responses
+- Topic competency updates based on test performance
+- Country-specific question filtering
+- Best score tracking and attempt history
+- Pass/fail determination based on passing score
 
-**Coming Soon:**
+**Backend Ready (Pending Frontend):**
 
-- Test question database population
 - Test-taking interface with timer
-- Answer explanations and lesson references
+- Results page with detailed explanations
 - Adaptive question selection based on weak topics
+- Real-time test submission and scoring
 
 ### 7. User Management & Authentication
 
