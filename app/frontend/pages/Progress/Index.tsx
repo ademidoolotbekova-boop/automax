@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -12,12 +12,15 @@ import {
   CheckCircle2,
   BarChart3
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Props {
   country: string
 }
 
 export default function ProgressIndex({ country }: Props) {
+  const { props } = usePage()
+  const { t } = useTranslation(props.selectedLanguage as any)
   const countryName = { kg: 'Kyrgyzstan', ru: 'Russia', us: 'USA' }[country]
 
   // Mock data for Level 1
@@ -54,9 +57,9 @@ export default function ProgressIndex({ country }: Props) {
           {/* Header */}
           <div className="px-4 lg:px-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">My Progress</h1>
+              <h1 className="text-3xl font-bold tracking-tight">{t.progress.myProgress}</h1>
               <p className="text-muted-foreground mt-2">
-                Track your learning journey in {countryName}
+                {t.progress.trackYourJourney} {countryName}
               </p>
             </div>
           </div>
@@ -77,34 +80,34 @@ export default function ProgressIndex({ country }: Props) {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Study Time</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.progress.studyTime}</CardTitle>
                   <Clock className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalTime} min</div>
-                  <p className="text-xs text-muted-foreground mt-1">Total time invested</p>
+                  <div className="text-2xl font-bold">{stats.totalTime} {t.lessons.duration}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{t.progress.totalTimeInvested}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Current Streak</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.dashboard.currentStreak}</CardTitle>
                   <Calendar className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.streak} days</div>
-                  <p className="text-xs text-muted-foreground mt-1">Keep learning daily!</p>
+                  <div className="text-2xl font-bold">{stats.streak} {t.common.days}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{t.dashboard.keepLearningDaily}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Practice Tests</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.progress.practiceTests}</CardTitle>
                   <BarChart3 className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.practiceTests}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Tests completed</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t.progress.testsCompleted}</p>
                 </CardContent>
               </Card>
             </div>
@@ -114,8 +117,8 @@ export default function ProgressIndex({ country }: Props) {
           <div className="px-4 lg:px-6">
             <Card>
               <CardHeader>
-                <CardTitle>Progress by Category</CardTitle>
-                <CardDescription>Your completion status for each lesson category</CardDescription>
+                <CardTitle>{t.progress.progressByCategory}</CardTitle>
+                <CardDescription>{t.progress.completionStatus}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -124,7 +127,7 @@ export default function ProgressIndex({ country }: Props) {
                       <div className="flex items-center justify-between text-sm">
                         <span className="font-medium">{cat.category}</span>
                         <span className="text-muted-foreground">
-                          {cat.completed} / {cat.total} lessons
+                          {cat.completed} / {cat.total} {t.common.lessons}
                         </span>
                       </div>
                       <Progress value={cat.percentage} />
@@ -141,9 +144,9 @@ export default function ProgressIndex({ country }: Props) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Award className="size-5" />
-                  Achievements
+                  {t.progress.achievements}
                 </CardTitle>
-                <CardDescription>Unlock badges as you progress</CardDescription>
+                <CardDescription>{t.progress.unlockBadges}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">

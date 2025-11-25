@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react'
+import { Link, router, usePage } from '@inertiajs/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Lightbulb
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Lesson {
   id: number
@@ -46,6 +47,9 @@ interface Props {
 }
 
 export default function LessonShow({ lesson, category, content, prev_lesson, next_lesson, country }: Props) {
+  const { props } = usePage()
+  const { t } = useTranslation(props.selectedLanguage as any)
+
   const handleMarkComplete = () => {
     router.post(`/lessons/${lesson.id}/complete`, {}, {
       preserveScroll: true,
@@ -82,14 +86,14 @@ export default function LessonShow({ lesson, category, content, prev_lesson, nex
                     {lesson.completed && (
                       <div className="flex items-center gap-1.5 text-green-600">
                         <CheckCircle2 className="size-4" />
-                        <span>Completed</span>
+                        <span>{t.common.complete}</span>
                       </div>
                     )}
                   </div>
                 </div>
                 <Button onClick={handleAskAI} variant="outline">
                   <MessageSquare className="mr-2 size-4" />
-                  Ask AI
+                  {t.lessons.askAI}
                 </Button>
               </div>
             </div>
@@ -120,7 +124,7 @@ export default function LessonShow({ lesson, category, content, prev_lesson, nex
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Lightbulb className="size-5 text-blue-500" />
-                    <CardTitle className="text-xl">Key Points to Remember</CardTitle>
+                    <CardTitle className="text-xl">{t.lessons.keyPointsToRemember}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -149,7 +153,7 @@ export default function LessonShow({ lesson, category, content, prev_lesson, nex
                     <Link href={`/lessons/${prev_lesson.id}`}>
                       <Button variant="outline">
                         <ChevronLeft className="mr-2 size-4" />
-                        Previous Lesson
+                        {t.lessons.previousLesson}
                       </Button>
                     </Link>
                   )}
@@ -159,13 +163,13 @@ export default function LessonShow({ lesson, category, content, prev_lesson, nex
                   {!lesson.completed && (
                     <Button onClick={handleMarkComplete} variant="default">
                       <CheckCircle2 className="mr-2 size-4" />
-                      Mark as Complete
+                      {t.lessons.markAsComplete}
                     </Button>
                   )}
                   {next_lesson && (
                     <Link href={`/lessons/${next_lesson.id}`}>
                       <Button>
-                        Next Lesson
+                        {t.lessons.nextLesson}
                         <ChevronRight className="ml-2 size-4" />
                       </Button>
                     </Link>

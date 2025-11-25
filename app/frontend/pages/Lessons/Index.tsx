@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import {
   Circle,
   ArrowRight
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Lesson {
   id: number
@@ -47,6 +48,8 @@ const ICON_MAP: Record<string, any> = {
 }
 
 export default function LessonsIndex({ categories, country }: Props) {
+  const { props } = usePage()
+  const { t } = useTranslation(props.selectedLanguage as any)
   const totalLessons = categories.reduce((sum, cat) => sum + cat.lessons.length, 0)
   const completedLessons = categories.reduce(
     (sum, cat) => sum + cat.lessons.filter(l => l.completed).length,
@@ -61,22 +64,22 @@ export default function LessonsIndex({ categories, country }: Props) {
           <div className="px-4 lg:px-6">
             <div className="flex flex-col gap-4">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">Browse Lessons</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t.lessons.browseLessons}</h1>
                 <p className="text-muted-foreground mt-2">
-                  Master driving rules with structured lessons covering all essential topics
+                  {t.lessons.masterDrivingRules}
                 </p>
               </div>
 
               {/* Progress Overview */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Your Learning Progress</CardTitle>
+                  <CardTitle className="text-lg">{t.lessons.yourLearningProgress}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
                       <div className="mb-2 flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Completed Lessons</span>
+                        <span className="text-muted-foreground">{t.lessons.completedLessons}</span>
                         <span className="font-medium">{completedLessons} / {totalLessons}</span>
                       </div>
                       <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
@@ -146,7 +149,7 @@ export default function LessonsIndex({ categories, country }: Props) {
                                 </div>
                               </div>
                               <Button variant="ghost" size="sm" className="shrink-0">
-                                Start
+                                {t.lessons.start}
                                 <ArrowRight className="ml-2 size-4" />
                               </Button>
                             </div>
