@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   PlayCircle
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Test {
   id: number
@@ -32,6 +33,8 @@ interface Props {
 }
 
 export default function PracticeTestsIndex({ tests, country }: Props) {
+  const { props } = usePage()
+  const { t } = useTranslation(props.selectedLanguage as any)
   const countryName = { kg: 'Kyrgyzstan', ru: 'Russia', us: 'USA' }[country]
 
   const getDifficultyVariant = (color: string) => {
@@ -48,9 +51,9 @@ export default function PracticeTestsIndex({ tests, country }: Props) {
           {/* Header */}
           <div className="px-4 lg:px-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Practice Tests</h1>
+              <h1 className="text-3xl font-bold tracking-tight">{t.practiceTests.title}</h1>
               <p className="text-muted-foreground mt-2">
-                Test your knowledge with exam-style questions for {countryName}
+                {t.practiceTests.subtitle} {countryName}
               </p>
             </div>
           </div>
@@ -90,7 +93,7 @@ export default function PracticeTestsIndex({ tests, country }: Props) {
                       </Badge>
                       <Badge variant="outline">
                         <Trophy className="mr-1 size-3" />
-                        Pass: {test.passing_score}%
+                        {t.practiceTests.pass}: {test.passing_score}%
                       </Badge>
                     </div>
 
@@ -98,7 +101,7 @@ export default function PracticeTestsIndex({ tests, country }: Props) {
                     {test.attempts_count > 0 && (
                       <div className="mb-4 p-3 rounded-lg bg-muted/50">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Best Score:</span>
+                          <span className="text-muted-foreground">{t.practiceTests.bestScore}:</span>
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-lg">
                               {Math.round((test.best_score / test.questions_count) * 100)}%
@@ -109,7 +112,7 @@ export default function PracticeTestsIndex({ tests, country }: Props) {
                           </div>
                         </div>
                         <div className="mt-2 text-xs text-muted-foreground">
-                          {test.attempts_count} attempt{test.attempts_count !== 1 ? 's' : ''}
+                          {test.attempts_count} {test.attempts_count === 1 ? t.practiceTests.attempt : t.practiceTests.attempts}
                         </div>
                       </div>
                     )}
@@ -118,7 +121,7 @@ export default function PracticeTestsIndex({ tests, country }: Props) {
                       <Link href={`/practice-tests/${test.id}`}>
                         <Button className="w-full">
                           <PlayCircle className="mr-2 size-4" />
-                          {test.attempts_count > 0 ? 'Try Again' : 'Start Test'}
+                          {test.attempts_count > 0 ? t.practiceTests.tryAgain : t.practiceTests.startTest}
                         </Button>
                       </Link>
                     </div>

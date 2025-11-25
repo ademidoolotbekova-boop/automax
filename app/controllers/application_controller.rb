@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
         notice: flash[:notice]
       },
       selectedCountry: session[:selected_country] || 'kg',
-      selectedLanguage: session[:selected_language] || 'en'
+      selectedLanguage: session[:selected_language] || 'ru'
     }
   end
 

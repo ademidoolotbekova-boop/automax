@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +13,7 @@ import {
   Home,
   Lightbulb
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Answer {
   text: string
@@ -50,6 +51,9 @@ interface Props {
 }
 
 export default function PracticeTestsResult({ test, attempt, results }: Props) {
+  const { props } = usePage()
+  const { t } = useTranslation(props.selectedLanguage as any)
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -63,7 +67,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
           <div className="px-4 lg:px-6">
             {/* Header */}
             <div className="mb-6">
-              <h1 className="text-3xl font-bold tracking-tight mb-2">Test Results</h1>
+              <h1 className="text-3xl font-bold tracking-tight mb-2">{t.practiceTests.testResults}</h1>
               <p className="text-muted-foreground">{test.title}</p>
             </div>
 
@@ -87,12 +91,12 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                     )}
                     <div>
                       <CardTitle className="text-2xl">
-                        {attempt.passed ? 'Congratulations! You Passed!' : 'Keep Trying!'}
+                        {attempt.passed ? t.practiceTests.congratulations : t.practiceTests.keepTrying}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground mt-1">
                         {attempt.passed
-                          ? `You've achieved a passing score of ${test.passing_score}%`
-                          : `You need ${test.passing_score}% to pass. You're almost there!`
+                          ? `${t.practiceTests.passedMessage} ${test.passing_score}%`
+                          : `${t.practiceTests.failedMessage} ${test.passing_score}% ${t.practiceTests.toPass}`
                         }
                       </p>
                     </div>
@@ -113,7 +117,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">{attempt.correct_answers}</p>
-                      <p className="text-xs text-muted-foreground">Correct Answers</p>
+                      <p className="text-xs text-muted-foreground">{t.practiceTests.correctAnswers}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -122,7 +126,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">{attempt.total_questions}</p>
-                      <p className="text-xs text-muted-foreground">Total Questions</p>
+                      <p className="text-xs text-muted-foreground">{t.practiceTests.totalQuestions}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -131,7 +135,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">{formatDuration(attempt.duration_seconds)}</p>
-                      <p className="text-xs text-muted-foreground">Time Taken</p>
+                      <p className="text-xs text-muted-foreground">{t.practiceTests.timeTaken}</p>
                     </div>
                   </div>
                 </div>
@@ -143,13 +147,13 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
               <Link href="/practice-tests">
                 <Button variant="outline">
                   <Home className="mr-2 size-4" />
-                  Back to Tests
+                  {t.practiceTests.backToTests}
                 </Button>
               </Link>
               <Link href={`/practice-tests/${test.title}`}>
                 <Button>
                   <RotateCcw className="mr-2 size-4" />
-                  Try Again
+                  {t.practiceTests.tryAgain}
                 </Button>
               </Link>
             </div>
@@ -158,7 +162,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
             <div className="space-y-6">
               <div className="flex items-center gap-2">
                 <Lightbulb className="size-5 text-blue-500" />
-                <h2 className="text-xl font-semibold">Detailed Review</h2>
+                <h2 className="text-xl font-semibold">{t.practiceTests.detailedReview}</h2>
               </div>
 
               {results.map((result, index) => (
@@ -174,16 +178,16 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline">Question {index + 1}</Badge>
+                          <Badge variant="outline">{t.practiceTests.question} {index + 1}</Badge>
                           {result.is_correct ? (
                             <Badge variant="default" className="bg-green-500">
                               <CheckCircle2 className="mr-1 size-3" />
-                              Correct
+                              {t.practiceTests.correct}
                             </Badge>
                           ) : (
                             <Badge variant="destructive">
                               <XCircle className="mr-1 size-3" />
-                              Incorrect
+                              {t.practiceTests.incorrect}
                             </Badge>
                           )}
                         </div>
@@ -197,7 +201,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                     <div className="space-y-4">
                       {/* Your Answer */}
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">Your Answer:</p>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">{t.practiceTests.yourAnswer}</p>
                         <div
                           className={`p-3 rounded-lg ${
                             result.is_correct
@@ -212,7 +216,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                       {/* Correct Answer (if wrong) */}
                       {!result.is_correct && (
                         <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Correct Answer:</p>
+                          <p className="text-sm font-medium text-muted-foreground mb-2">{t.practiceTests.correctAnswer}</p>
                           <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
                             <p className="leading-relaxed">{result.correct_answer_text}</p>
                           </div>
@@ -227,7 +231,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                           <Lightbulb className="size-4 text-blue-500 shrink-0 mt-0.5" />
                           <div>
                             <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                              Explanation
+                              {t.practiceTests.explanation}
                             </p>
                             <p className="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
                               {result.explanation}
@@ -240,7 +244,7 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
                       {!result.is_correct && (
                         <details className="group">
                           <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground">
-                            Show all answers and explanations
+                            {t.practiceTests.showAllAnswers}
                           </summary>
                           <div className="mt-3 space-y-2">
                             {result.all_answers.map((answer, idx) => (
@@ -279,13 +283,13 @@ export default function PracticeTestsResult({ test, attempt, results }: Props) {
               <Link href="/practice-tests">
                 <Button variant="outline" size="lg">
                   <Home className="mr-2 size-4" />
-                  Back to Tests
+                  {t.practiceTests.backToTests}
                 </Button>
               </Link>
               <Link href={`/practice-tests/${test.title}`}>
                 <Button size="lg">
                   <RotateCcw className="mr-2 size-4" />
-                  Try Again
+                  {t.practiceTests.tryAgain}
                 </Button>
               </Link>
             </div>

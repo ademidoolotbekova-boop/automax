@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { router } from '@inertiajs/react'
+import { router, usePage } from '@inertiajs/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Flag
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Answer {
   id: number
@@ -43,6 +44,8 @@ interface Props {
 }
 
 export default function PracticeTestsTake({ test, attempt_id, questions, country }: Props) {
+  const { props } = usePage()
+  const { t } = useTranslation(props.selectedLanguage as any)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({})
   const [timeRemaining, setTimeRemaining] = useState(test.duration_minutes * 60) // in seconds
@@ -118,7 +121,7 @@ export default function PracticeTestsTake({ test, attempt_id, questions, country
                 <div>
                   <h1 className="text-2xl font-bold tracking-tight">{test.title}</h1>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Question {currentQuestionIndex + 1} of {questions.length}
+                    {t.practiceTests.question} {currentQuestionIndex + 1} {t.practiceTests.of} {questions.length}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -142,18 +145,18 @@ export default function PracticeTestsTake({ test, attempt_id, questions, country
                     <AlertCircle className="size-5 text-orange-500 shrink-0 mt-0.5" />
                     <div className="flex-1">
                       <p className="font-medium text-orange-900 dark:text-orange-100">
-                        You haven't answered all questions
+                        {t.practiceTests.notAnsweredAll}
                       </p>
                       <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
-                        You've answered {answeredCount} out of {questions.length} questions.
-                        Are you sure you want to submit?
+                        {t.practiceTests.answeredCount} {answeredCount} {t.practiceTests.outOf} {questions.length} {t.practiceTests.questions}.
+                        {t.practiceTests.areYouSure}
                       </p>
                       <div className="flex gap-2 mt-3">
                         <Button size="sm" variant="outline" onClick={() => setShowWarning(false)}>
-                          Continue Test
+                          {t.practiceTests.continueTest}
                         </Button>
                         <Button size="sm" variant="destructive" onClick={handleSubmit}>
-                          Submit Anyway
+                          {t.practiceTests.submitAnyway}
                         </Button>
                       </div>
                     </div>
@@ -215,18 +218,18 @@ export default function PracticeTestsTake({ test, attempt_id, questions, country
                 disabled={currentQuestionIndex === 0}
               >
                 <ChevronLeft className="mr-2 size-4" />
-                Previous
+                {t.practiceTests.previous}
               </Button>
 
               <div className="flex gap-2">
                 {currentQuestionIndex === questions.length - 1 ? (
                   <Button onClick={handleSubmit} size="lg">
                     <Flag className="mr-2 size-4" />
-                    Submit Test
+                    {t.practiceTests.submitTest}
                   </Button>
                 ) : (
                   <Button onClick={handleNext}>
-                    Next
+                    {t.practiceTests.next}
                     <ChevronRight className="ml-2 size-4" />
                   </Button>
                 )}
@@ -236,7 +239,7 @@ export default function PracticeTestsTake({ test, attempt_id, questions, country
             {/* Question Grid Navigation */}
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="text-sm">Question Overview</CardTitle>
+                <CardTitle className="text-sm">{t.practiceTests.questionOverview}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-8 gap-2">
