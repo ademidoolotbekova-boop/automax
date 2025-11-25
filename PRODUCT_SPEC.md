@@ -370,7 +370,7 @@ The AI assistant can answer questions about:
 - Breadcrumb navigation
 - Profile dropdown
 
-### Implementation Details (Level 1)
+### Implementation Details (Level 2)
 
 **Frontend:**
 - React + TypeScript + Inertia.js
@@ -380,27 +380,40 @@ The AI assistant can answer questions about:
 - Dark mode support
 
 **Backend:**
-- Rails 8.0 controllers
-- Mock data for lessons
-- Session-based country storage
-- Mock AI responses (ready for real API)
+- Rails 8.0 with PostgreSQL
+- Full database schema for lessons, progress, tests, and conversations
+- Session-based country and language storage
+- Real user progress persistence
+
+**Database Models:**
+
+- **Lesson System**: LessonCategory, Lesson, UserLessonProgress
+- **Practice Tests**: PracticeTest, Question, Answer, TestAttempt, UserAnswer
+- **AI Assistant**: Conversation, Message (ready for API integration)
+
+**What's Implemented:**
+
+- Complete lesson database with 21 lessons across 7 categories
+- User progress tracking (started, completed, time spent)
+- Practice test infrastructure (questions, answers, scoring)
+- Chat conversation persistence
+- Country-specific content support
 
 **What's Mock/Placeholder:**
-- Lesson completion not persisted (UI only)
-- Progress data is hardcoded
-- AI responses use simple pattern matching (not real AI yet)
+
+- AI responses still use pattern matching (API integration pending)
 - Image analysis UI only (no actual processing)
-- Practice tests coming soon
+- Practice test questions need to be populated
+- Frontend still reads from old controller data (migration in progress)
 
 ## Next Steps (Future Versions)
 
-### Level 2: Full Backend Implementation
+### Level 2: Remaining Tasks
 
-- Database models for lessons and progress
-- Real progress persistence
-- User-specific lesson completion tracking
-- Practice test database and scoring system
-- Real-time progress analytics
+- Update controllers to use database instead of hardcoded data
+- Complete frontend integration with database
+- Add practice test questions and interface
+- Integrate real AI API (OpenAI/Anthropic)
 
 ### Level 3: Production Ready
 

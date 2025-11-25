@@ -30,6 +30,11 @@ class User < ApplicationRecord
   # Associations
   has_many :refresh_tokens, dependent: :destroy
   has_one_attached :avatar
+  has_many :user_lesson_progresses, dependent: :destroy
+  has_many :completed_lessons, -> { where(user_lesson_progresses: { completed: true }) },
+           through: :user_lesson_progresses, source: :lesson
+  has_many :test_attempts, dependent: :destroy
+  has_many :conversations, dependent: :destroy
 
   # Validations
   validates :email, presence: true,

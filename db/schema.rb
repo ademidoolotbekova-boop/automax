@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_223203) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_25_173015) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,6 +39,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_223203) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "answers", force: :cascade do |t|
+    t.integer "question_id", null: false
+    t.text "answer_text"
+    t.boolean "is_correct"
+    t.text "explanation"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["question_id"], name: "index_answers_on_question_id"
+  end
+
   create_table "audits", force: :cascade do |t|
     t.integer "auditable_id"
     t.string "auditable_type"
@@ -59,6 +70,86 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_223203) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "conversations", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "country", null: false
+    t.datetime "started_at"
+    t.datetime "last_message_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "created_at"], name: "index_conversations_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_conversations_on_user_id"
+  end
+
+  create_table "lesson_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.string "icon"
+    t.integer "position", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_lesson_categories_on_position"
+    t.index ["slug"], name: "index_lesson_categories_on_slug", unique: true
+  end
+
+  create_table "lessons", force: :cascade do |t|
+    t.integer "lesson_category_id", null: false
+    t.string "title", null: false
+    t.string "slug", null: false
+    t.integer "duration_minutes", null: false
+    t.integer "position", null: false
+    t.text "introduction"
+    t.json "sections"
+    t.json "key_points"
+    t.string "quiz_preview"
+    t.json "country_specific_content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lesson_category_id", "position"], name: "index_lessons_on_lesson_category_id_and_position"
+    t.index ["lesson_category_id"], name: "index_lessons_on_lesson_category_id"
+    t.index ["slug"], name: "index_lessons_on_slug", unique: true
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer "conversation_id", null: false
+    t.string "role", null: false
+    t.text "content", null: false
+    t.string "image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+  end
+
+  create_table "practice_tests", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.string "test_type", null: false
+    t.integer "duration_minutes", null: false
+    t.integer "questions_count", null: false
+    t.integer "passing_score", null: false
+    t.integer "position", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_practice_tests_on_position"
+    t.index ["test_type"], name: "index_practice_tests_on_test_type"
+  end
+
+  create_table "questions", force: :cascade do |t|
+    t.integer "practice_test_id", null: false
+    t.text "question_text", null: false
+    t.string "question_type", default: "multiple_choice"
+    t.integer "position", null: false
+    t.string "country"
+    t.string "image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["country"], name: "index_questions_on_country"
+    t.index ["practice_test_id", "position"], name: "index_questions_on_practice_test_id_and_position"
+    t.index ["practice_test_id"], name: "index_questions_on_practice_test_id"
   end
 
   create_table "refresh_tokens", force: :cascade do |t|
@@ -204,6 +295,47 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_223203) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "test_attempts", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "practice_test_id", null: false
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.integer "score"
+    t.integer "total_questions"
+    t.integer "correct_answers"
+    t.boolean "passed"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["practice_test_id"], name: "index_test_attempts_on_practice_test_id"
+    t.index ["user_id"], name: "index_test_attempts_on_user_id"
+  end
+
+  create_table "user_answers", force: :cascade do |t|
+    t.integer "test_attempt_id", null: false
+    t.integer "question_id", null: false
+    t.integer "answer_id", null: false
+    t.boolean "is_correct"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["answer_id"], name: "index_user_answers_on_answer_id"
+    t.index ["question_id"], name: "index_user_answers_on_question_id"
+    t.index ["test_attempt_id"], name: "index_user_answers_on_test_attempt_id"
+  end
+
+  create_table "user_lesson_progresses", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "lesson_id", null: false
+    t.boolean "completed", default: false, null: false
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.integer "time_spent_minutes", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lesson_id"], name: "index_user_lesson_progresses_on_lesson_id"
+    t.index ["user_id", "lesson_id"], name: "index_user_lesson_progresses_on_user_id_and_lesson_id", unique: true
+    t.index ["user_id"], name: "index_user_lesson_progresses_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "name", null: false
@@ -224,6 +356,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_223203) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "answers", "questions"
+  add_foreign_key "conversations", "users"
+  add_foreign_key "lessons", "lesson_categories"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "questions", "practice_tests"
   add_foreign_key "refresh_tokens", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -231,4 +368,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_223203) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "test_attempts", "practice_tests"
+  add_foreign_key "test_attempts", "users"
+  add_foreign_key "user_answers", "answers"
+  add_foreign_key "user_answers", "questions"
+  add_foreign_key "user_answers", "test_attempts"
+  add_foreign_key "user_lesson_progresses", "lessons"
+  add_foreign_key "user_lesson_progresses", "users"
 end
