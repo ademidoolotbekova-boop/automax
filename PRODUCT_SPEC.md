@@ -158,21 +158,49 @@ The AI assistant can answer questions about:
 - "Practice Makes Perfect" - Pass 5 practice tests
 - Achievement badges unlock as milestones are reached
 
-### 6. Practice Tests (Placeholder)
+### 6. Practice Tests
 
-**Planned Test Categories:**
+**Test Difficulty Levels:**
+
+Users can choose from three difficulty levels:
+
+- **Easy**: Simple questions for beginners, more time per question
+- **Medium**: Standard difficulty, balanced timing
+- **Exam Mode**: Realistic exam conditions, strict timing, no hints
+
+Each test displays a difficulty badge with color coding (green/orange/red).
+
+**Test Categories:**
 
 - Quick Quiz (10 questions, 5 minutes)
 - Traffic Signs Test (15 questions, 10 minutes)
 - Full Practice Exam (40 questions, 30 minutes)
 - Advanced Scenarios (25 questions, 20 minutes)
 
-**Features (Coming Soon):**
+**Topic Competency Tracking:**
 
-- Exam-style questions based on country-specific rules
-- Instant feedback and explanations
+The system automatically tracks user performance by topic:
+
+- Accuracy percentage for each category (Traffic Signs, Lane Changes, etc.)
+- Competency score (0-100) based on accuracy and recency
+- Strength levels: Beginner, Weak, Moderate, Strong, Expert
+- Last practice date tracking with decay factor
+- Strong topics (70%+ competency) vs Weak topics (<50%)
+
+**Features (Infrastructure Ready):**
+
+- Test attempt history with scores
+- Correct/incorrect answer tracking per topic
+- Adaptive difficulty recommendations
 - Score tracking and analytics
 - Timed tests simulating real exams
+
+**Coming Soon:**
+
+- Test question database population
+- Test-taking interface with timer
+- Answer explanations and lesson references
+- Adaptive question selection based on weak topics
 
 ### 7. User Management & Authentication
 
