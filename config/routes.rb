@@ -61,6 +61,7 @@ Rails.application.routes.draw do
   # Lessons
   get :lessons, to: "lessons#index"
   get "lessons/:id", to: "lessons#show", as: :lesson
+  post "lessons/:id/complete", to: "lessons#complete", as: :complete_lesson
 
   # Practice Tests (placeholder for future)
   get "practice-tests", to: "practice_tests#index"
