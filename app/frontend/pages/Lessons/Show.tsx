@@ -47,9 +47,12 @@ interface Props {
 
 export default function LessonShow({ lesson, category, content, prev_lesson, next_lesson, country }: Props) {
   const handleMarkComplete = () => {
-    // In Level 1, this would just show feedback
-    // In Level 2+, this would persist to database
-    console.log('Mark complete:', lesson.id)
+    router.post(`/lessons/${lesson.id}/complete`, {}, {
+      preserveScroll: true,
+      onSuccess: () => {
+        router.reload({ only: ['lesson'] })
+      }
+    })
   }
 
   const handleAskAI = () => {
