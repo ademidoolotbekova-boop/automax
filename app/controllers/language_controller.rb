@@ -11,6 +11,6 @@ class LanguageController < ApplicationController
     # Store in session
     session[:selected_language] = language
 
-    head :ok
+    redirect_back(fallback_location: root_path)
   end
 end

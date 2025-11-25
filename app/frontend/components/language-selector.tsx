@@ -17,10 +17,7 @@ export function LanguageSelector({ selectedLanguage = 'en' }: LanguageSelectorPr
   const currentLanguage = SUPPORTED_LANGUAGES[selectedLanguage]
 
   const handleLanguageChange = (langCode: string) => {
-    router.post('/language/select', { language: langCode }, {
-      preserveState: true,
-      preserveScroll: true,
-    })
+    router.post('/language/select', { language: langCode })
   }
 
   return (
