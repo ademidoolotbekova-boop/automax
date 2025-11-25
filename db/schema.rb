@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_25_173015) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_25_180313) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -134,6 +134,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_173015) do
     t.integer "position", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "difficulty", default: "medium", null: false
+    t.index ["difficulty"], name: "index_practice_tests_on_difficulty"
     t.index ["position"], name: "index_practice_tests_on_position"
     t.index ["test_type"], name: "index_practice_tests_on_test_type"
   end
@@ -336,6 +338,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_173015) do
     t.index ["user_id"], name: "index_user_lesson_progresses_on_user_id"
   end
 
+  create_table "user_topic_competencies", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "lesson_category_id", null: false
+    t.integer "correct_answers"
+    t.integer "total_attempts"
+    t.decimal "competency_score"
+    t.datetime "last_practiced_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lesson_category_id"], name: "index_user_topic_competencies_on_lesson_category_id"
+    t.index ["user_id"], name: "index_user_topic_competencies_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "name", null: false
@@ -375,4 +390,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_173015) do
   add_foreign_key "user_answers", "test_attempts"
   add_foreign_key "user_lesson_progresses", "lessons"
   add_foreign_key "user_lesson_progresses", "users"
+  add_foreign_key "user_topic_competencies", "lesson_categories"
+  add_foreign_key "user_topic_competencies", "users"
 end

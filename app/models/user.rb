@@ -35,6 +35,7 @@ class User < ApplicationRecord
            through: :user_lesson_progresses, source: :lesson
   has_many :test_attempts, dependent: :destroy
   has_many :conversations, dependent: :destroy
+  has_many :user_topic_competencies, dependent: :destroy
 
   # Validations
   validates :email, presence: true,
