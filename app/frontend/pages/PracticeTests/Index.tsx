@@ -1,53 +1,45 @@
+import { Link } from '@inertiajs/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
   ClipboardList,
-  Lock,
   Clock,
   Target,
-  TrendingUp
+  Trophy,
+  CheckCircle2,
+  PlayCircle
 } from 'lucide-react'
 
+interface Test {
+  id: number
+  title: string
+  description: string
+  difficulty: string
+  difficulty_display: string
+  difficulty_color: string
+  duration: string
+  questions_count: number
+  passing_score: number
+  best_score: number
+  attempts_count: number
+  passed: boolean
+}
+
 interface Props {
+  tests: Test[]
   country: string
 }
 
-export default function PracticeTestsIndex({ country }: Props) {
+export default function PracticeTestsIndex({ tests, country }: Props) {
   const countryName = { kg: 'Kyrgyzstan', ru: 'Russia', us: 'USA' }[country]
 
-  const testCategories = [
-    {
-      title: 'Quick Quiz',
-      description: '10 random questions to test your knowledge',
-      duration: '5 min',
-      questions: 10,
-      locked: false
-    },
-    {
-      title: 'Traffic Signs Test',
-      description: 'Focus on road signs and signals',
-      duration: '10 min',
-      questions: 15,
-      locked: false
-    },
-    {
-      title: 'Full Practice Exam',
-      description: 'Complete exam simulation with 40 questions',
-      duration: '30 min',
-      questions: 40,
-      locked: true,
-      requirement: 'Complete 10 lessons to unlock'
-    },
-    {
-      title: 'Advanced Scenarios',
-      description: 'Complex driving situations and decision making',
-      duration: '20 min',
-      questions: 25,
-      locked: true,
-      requirement: 'Complete all lessons to unlock'
-    },
-  ]
+  const getDifficultyVariant = (color: string) => {
+    if (color === 'green') return 'default'
+    if (color === 'orange') return 'secondary'
+    if (color === 'red') return 'destructive'
+    return 'secondary'
+  }
 
   return (
     <div className="flex flex-1 flex-col">
@@ -63,92 +55,73 @@ export default function PracticeTestsIndex({ country }: Props) {
             </div>
           </div>
 
-          {/* Coming Soon Notice */}
-          <div className="px-4 lg:px-6">
-            <Card className="border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="size-5 text-blue-500" />
-                  Coming Soon!
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  Practice tests are currently under development. This feature will include:
-                </p>
-                <ul className="mt-3 space-y-2 ml-4">
-                  <li className="flex gap-2">
-                    <span>•</span>
-                    <span>Exam-style questions based on {countryName} traffic rules</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>•</span>
-                    <span>Instant feedback and explanations for each answer</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>•</span>
-                    <span>Score tracking and performance analytics</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>•</span>
-                    <span>Timed tests to simulate real exam conditions</span>
-                  </li>
-                </ul>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  In the meantime, continue learning with our lessons and ask the AI assistant any questions you have!
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Test Categories (Preview) */}
+          {/* Test Categories */}
           <div className="px-4 lg:px-6">
             <div className="grid gap-4 md:grid-cols-2">
-              {testCategories.map((test, index) => (
-                <Card key={index} className={test.locked ? 'opacity-60' : ''}>
+              {tests.map((test) => (
+                <Card key={test.id} className="flex flex-col">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="flex items-center gap-2">
-                          {test.locked ? (
-                            <Lock className="size-4 text-muted-foreground" />
-                          ) : (
+                        <div className="flex items-center gap-2 mb-2">
+                          <CardTitle className="flex items-center gap-2">
                             <ClipboardList className="size-4" />
-                          )}
-                          {test.title}
-                        </CardTitle>
-                        <CardDescription className="mt-2">
+                            {test.title}
+                          </CardTitle>
+                          <Badge variant={getDifficultyVariant(test.difficulty_color)}>
+                            {test.difficulty_display}
+                          </Badge>
+                        </div>
+                        <CardDescription>
                           {test.description}
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1 flex flex-col">
                     <div className="flex flex-wrap items-center gap-2 mb-4">
-                      <Badge variant="secondary">
+                      <Badge variant="outline">
                         <Clock className="mr-1 size-3" />
                         {test.duration}
                       </Badge>
-                      <Badge variant="secondary">
+                      <Badge variant="outline">
                         <Target className="mr-1 size-3" />
-                        {test.questions} questions
+                        {test.questions_count} questions
+                      </Badge>
+                      <Badge variant="outline">
+                        <Trophy className="mr-1 size-3" />
+                        Pass: {test.passing_score}%
                       </Badge>
                     </div>
-                    {test.locked ? (
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {test.requirement}
-                        </p>
-                        <Button disabled className="w-full">
-                          <Lock className="mr-2 size-4" />
-                          Locked
-                        </Button>
+
+                    {/* Score Display */}
+                    {test.attempts_count > 0 && (
+                      <div className="mb-4 p-3 rounded-lg bg-muted/50">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Best Score:</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-lg">
+                              {Math.round((test.best_score / test.questions_count) * 100)}%
+                            </span>
+                            {test.passed && (
+                              <CheckCircle2 className="size-4 text-green-500" />
+                            )}
+                          </div>
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          {test.attempts_count} attempt{test.attempts_count !== 1 ? 's' : ''}
+                        </div>
                       </div>
-                    ) : (
-                      <Button disabled className="w-full">
-                        Coming Soon
-                      </Button>
                     )}
+
+                    <div className="mt-auto">
+                      <Link href={`/practice-tests/${test.id}`}>
+                        <Button className="w-full">
+                          <PlayCircle className="mr-2 size-4" />
+                          {test.attempts_count > 0 ? 'Try Again' : 'Start Test'}
+                        </Button>
+                      </Link>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
