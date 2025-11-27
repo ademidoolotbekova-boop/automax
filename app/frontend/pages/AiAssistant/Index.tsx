@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { router } from '@inertiajs/react'
+import { router, usePage } from '@inertiajs/react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -11,6 +11,7 @@ import {
   User,
   Loader2
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -24,15 +25,9 @@ interface Props {
   initial_context?: string
 }
 
-const QUICK_QUESTIONS = [
-  "What are the speed limits in my country?",
-  "Explain stop sign rules",
-  "How do I navigate roundabouts?",
-  "Right of way at intersections",
-  "Where can't I park?",
-]
-
 export default function AiAssistantIndex({ country, initial_context }: Props) {
+  const { props } = usePage()
+  const { t } = useTranslation(props.selectedLanguage as any)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState(initial_context || '')
   const [isLoading, setIsLoading] = useState(false)
@@ -40,6 +35,10 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const countryName = { kg: 'Kyrgyzstan', ru: 'Russia', us: 'USA' }[country]
+  const countryNameRu = { kg: 'Кыргызстане', ru: 'России', us: 'США' }[country]
+  const countryDisplayName = props.selectedLanguage === 'ru' ? countryNameRu : countryName
+
+  const quickQuestions = [t.aiAssistant.q1, t.aiAssistant.q2, t.aiAssistant.q3, t.aiAssistant.q4, t.aiAssistant.q5]
 
   useEffect(() => {
     // Show welcome message on first load
@@ -47,7 +46,7 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
       setMessages([
         {
           role: 'assistant',
-          content: `Hello! I'm your AI driving assistant for ${countryName}. I can help you understand traffic rules, road signs, and safe driving practices. What would you like to learn about today?`,
+          content: t.aiAssistant.welcomeMessage.replace('{country}', countryDisplayName),
           timestamp: new Date().toISOString()
         }
       ])
@@ -123,7 +122,7 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
 
   const handleImageUpload = () => {
     // For Level 1, show placeholder feedback
-    alert('Image upload will be available in the next version! For now, you can describe the image and I\'ll help explain it.')
+    alert(t.aiAssistant.imageUploadPlaceholder)
   }
 
   return (
@@ -133,14 +132,14 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
         <div className="shrink-0 px-4 py-4 lg:px-6 border-b">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">AI Driving Assistant</h1>
+              <h1 className="text-2xl font-bold tracking-tight">{t.aiAssistant.title}</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Ask questions about traffic rules in {countryName}
+                {t.aiAssistant.subtitle} {countryDisplayName}
               </p>
             </div>
             <Badge variant="secondary" className="gap-1.5">
               <Sparkles className="size-3" />
-              AI Powered
+              {t.aiAssistant.aiPowered}
             </Badge>
           </div>
         </div>
@@ -193,7 +192,7 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Loader2 className="size-4 animate-spin" />
-                      <span>Thinking...</span>
+                      <span>{t.aiAssistant.thinking}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -208,9 +207,9 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
         {messages.length <= 1 && (
           <div className="shrink-0 px-4 py-4 lg:px-6 border-t">
             <div className="mx-auto max-w-3xl">
-              <p className="mb-3 text-sm font-medium text-muted-foreground">Quick questions:</p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">{t.aiAssistant.quickQuestions}</p>
               <div className="flex flex-wrap gap-2">
-                {QUICK_QUESTIONS.map((question, index) => (
+                {quickQuestions.map((question, index) => (
                   <Button
                     key={index}
                     variant="outline"
@@ -243,7 +242,7 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="Ask about traffic rules, road signs, or upload an image..."
+                  placeholder={t.aiAssistant.placeholder}
                   className="min-h-[60px] max-h-[200px] resize-none pr-12"
                   disabled={isLoading}
                 />
@@ -262,7 +261,7 @@ export default function AiAssistantIndex({ country, initial_context }: Props) {
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground text-center">
-              Press Enter to send, Shift+Enter for new line
+              {t.aiAssistant.pressEnter}
             </p>
           </div>
         </div>

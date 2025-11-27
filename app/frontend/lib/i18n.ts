@@ -61,6 +61,14 @@ export const translations = {
       thinking: 'Thinking...',
       placeholder: 'Ask about traffic rules, road signs, or upload an image...',
       pressEnter: 'Press Enter to send, Shift+Enter for new line',
+      welcomeMessage: 'Hello! I\'m your AI driving assistant for {country}. I can help you understand traffic rules, road signs, and safe driving practices. What would you like to learn about today?',
+      imageUploadPlaceholder: 'Image upload will be available in the next version! For now, you can describe the image and I\'ll help explain it.',
+      // Quick question suggestions
+      q1: 'What are the speed limits in my country?',
+      q2: 'Explain stop sign rules',
+      q3: 'How do I navigate roundabouts?',
+      q4: 'Right of way at intersections',
+      q5: 'Where can\'t I park?',
     },
     // Progress
     progress: {
@@ -183,6 +191,14 @@ export const translations = {
       thinking: 'Думаю...',
       placeholder: 'Спросите о правилах дорожного движения, дорожных знаках или загрузите изображение...',
       pressEnter: 'Enter для отправки, Shift+Enter для новой строки',
+      welcomeMessage: 'Здравствуйте! Я ваш AI ассистент по вождению для {country}. Я помогу вам разобраться в правилах дорожного движения, дорожных знаках и безопасном вождении. О чём бы вы хотели узнать сегодня?',
+      imageUploadPlaceholder: 'Загрузка изображений будет доступна в следующей версии! А пока вы можете описать изображение, и я помогу объяснить его.',
+      // Quick question suggestions
+      q1: 'Какие ограничения скорости в моей стране?',
+      q2: 'Объясните правила знака "Стоп"',
+      q3: 'Как проезжать круговые перекрёстки?',
+      q4: 'Приоритет на перекрёстках',
+      q5: 'Где нельзя парковаться?',
     },
     // Progress
     progress: {

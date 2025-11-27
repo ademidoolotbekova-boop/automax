@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_25_180313) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_27_073532) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -47,6 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_180313) do
     t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "language", default: "en", null: false
     t.index ["question_id"], name: "index_answers_on_question_id"
   end
 
@@ -91,6 +92,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_180313) do
     t.integer "position", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "language", default: "en", null: false
+    t.index ["language"], name: "index_lesson_categories_on_language"
     t.index ["position"], name: "index_lesson_categories_on_position"
     t.index ["slug"], name: "index_lesson_categories_on_slug", unique: true
   end
@@ -108,6 +111,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_180313) do
     t.json "country_specific_content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "language", default: "en", null: false
+    t.index ["language"], name: "index_lessons_on_language"
     t.index ["lesson_category_id", "position"], name: "index_lessons_on_lesson_category_id_and_position"
     t.index ["lesson_category_id"], name: "index_lessons_on_lesson_category_id"
     t.index ["slug"], name: "index_lessons_on_slug", unique: true
@@ -135,7 +140,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_180313) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "difficulty", default: "medium", null: false
+    t.string "language", default: "en", null: false
     t.index ["difficulty"], name: "index_practice_tests_on_difficulty"
+    t.index ["language"], name: "index_practice_tests_on_language"
     t.index ["position"], name: "index_practice_tests_on_position"
     t.index ["test_type"], name: "index_practice_tests_on_test_type"
   end
@@ -149,7 +156,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_180313) do
     t.string "image_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "language", default: "en", null: false
     t.index ["country"], name: "index_questions_on_country"
+    t.index ["language"], name: "index_questions_on_language"
     t.index ["practice_test_id", "position"], name: "index_questions_on_practice_test_id_and_position"
     t.index ["practice_test_id"], name: "index_questions_on_practice_test_id"
   end

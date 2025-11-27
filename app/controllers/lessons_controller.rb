@@ -2,7 +2,8 @@ class LessonsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    categories = LessonCategory.includes(:lessons).ordered
+    lang = session[:selected_language] || 'ru'
+    categories = LessonCategory.includes(:lessons).where(language: lang).ordered
     country = session[:selected_country] || 'kg'
 
     categories_data = categories.map do |category|
@@ -35,14 +36,15 @@ class LessonsController < ApplicationController
 
   def show
     lesson = Lesson.includes(:lesson_category).find(params[:id])
+    lang = session[:selected_language] || 'ru'
     country = session[:selected_country] || 'kg'
 
     # Get or create progress for this lesson
     progress = lesson.user_lesson_progresses.find_or_initialize_by(user: current_user)
     progress.mark_as_started unless progress.persisted?
 
-    # Get previous and next lessons
-    all_lessons = Lesson.includes(:lesson_category).ordered
+    # Get previous and next lessons (in same language)
+    all_lessons = Lesson.includes(:lesson_category).where(language: lang).ordered
     current_index = all_lessons.index(lesson)
     prev_lesson = current_index > 0 ? all_lessons[current_index - 1] : nil
     next_lesson = current_index < all_lessons.length - 1 ? all_lessons[current_index + 1] : nil

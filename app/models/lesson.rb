@@ -32,6 +32,7 @@ class Lesson < ApplicationRecord
 
   def generate_slug
     base_slug = title.parameterize
+    base_slug = "lesson-#{id || rand(100000)}" if base_slug.blank?
     self.slug = base_slug
     counter = 1
     while Lesson.where(slug: slug).where.not(id: id).exists?

@@ -2,8 +2,9 @@ class PracticeTestsController < ApplicationController
   before_action :authenticate_user!
 
   def index
+    lang = session[:selected_language] || 'ru'
     country = session[:selected_country] || 'kg'
-    tests = PracticeTest.ordered
+    tests = PracticeTest.where(language: lang).ordered
 
     tests_data = tests.map do |test|
       user_attempts = current_user.test_attempts.where(practice_test_id: test.id).completed
@@ -38,10 +39,11 @@ class PracticeTestsController < ApplicationController
 
   def show
     test = PracticeTest.find(params[:id])
+    lang = session[:selected_language] || 'ru'
     country = session[:selected_country] || 'kg'
 
-    # Get questions for this test (filtered by country if needed)
-    questions = test.questions.includes(:answers).for_country(country)
+    # Get questions for this test (filtered by country and language)
+    questions = test.questions.includes(:answers).where(language: lang).for_country(country)
 
     # Create new test attempt
     attempt = current_user.test_attempts.create!(
