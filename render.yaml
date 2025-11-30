@@ -1,0 +1,31 @@
+services:
+  # Rails Web Service
+  - type: web
+    name: automax-web
+    runtime: ruby
+    plan: free
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: automax-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+      - key: NODE_ENV
+        value: production
+      - key: RAILS_LOG_TO_STDOUT
+        value: enabled
+      - key: RAILS_SERVE_STATIC_FILES
+        value: enabled
+    healthCheckPath: /up
+
+databases:
+  # PostgreSQL Database
+  - name: automax-db
+    plan: free
+    databaseName: automax_production
+    user: automax
