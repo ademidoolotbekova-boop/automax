@@ -2,14 +2,20 @@
 # exit on error
 set -o errexit
 
-# Install dependencies
+echo "===> Installing Ruby dependencies..."
 bundle install
+
+echo "===> Installing Node dependencies..."
 npm install
 
-# Precompile assets
+echo "===> Precompiling assets..."
 bundle exec rake assets:precompile
 bundle exec rake assets:clean
 
-# Run database migrations and seed
+echo "===> Running database migrations..."
 bundle exec rake db:migrate
-bundle exec rake db:seed
+
+echo "===> Seeding database..."
+bundle exec rake db:seed || echo "Warning: Seed failed, but continuing..."
+
+echo "===> Build completed successfully!"
