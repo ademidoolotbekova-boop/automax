@@ -23,7 +23,7 @@ gem "bcrypt", "~> 3.1.20"
 gem "jwt", "~> 2.7"
 
 # CORS for cross-origin requests
-gem "rack-cors", "~> 2.0"
+gem "rack-cors", "~> 3.0"
 
 # Helps moving logic to service objects
 gem "active_interaction", "~> 5.5"
