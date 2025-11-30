@@ -453,6 +453,38 @@ The system automatically tracks user performance by topic:
 - Image analysis UI only (no actual processing)
 - Remaining 12 lessons need seed data (infrastructure complete, 9 of 21 lessons seeded)
 
+## Deployment
+
+### Render.com Deployment (Configured)
+
+The application is configured for one-click deployment to Render.com:
+
+**Setup:**
+
+- `render.yaml` Blueprint configuration for automated deployment
+- `bin/render-build.sh` automated build script
+- PostgreSQL database with free tier support
+- Rails master key configuration for production
+- Asset precompilation and database seeding
+
+**Deployment Process:**
+
+1. Connect GitHub repository to Render
+2. Select Blueprint deployment
+3. Add RAILS_MASTER_KEY environment variable
+4. Deploy automatically creates web service + database
+5. Application accessible at public URL (e.g., `https://automax-web.onrender.com`)
+
+**Features:**
+
+- Free tier available (no credit card required)
+- Automatic deployments on git push
+- HTTPS enabled by default
+- PostgreSQL database included
+- 512MB RAM / shared CPU
+
+See `RENDER_DEPLOY.md` for detailed deployment instructions.
+
 ## Next Steps (Future Versions)
 
 ### Level 2: Remaining Tasks
