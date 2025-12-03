@@ -14,7 +14,7 @@ gem "jbuilder"
 # Vite for asset bundling and Hot Module Replacement in Rails
 gem "vite_rails", "~> 3.0"
 # Inertia.js adapter for Rails [https://github.com/inertiajs/inertia-rails]
-gem "inertia_rails", "~> 3.10"
+gem "inertia_rails", "~> 3.14"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.20"
